@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
@@ -7,9 +7,20 @@ import { ProgressRing } from '@/components/ProgressRing';
 import { useReport } from '@/hooks';
 import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
+const CHART_H = 160;
+
 /** 리포트 화면 (PRD §3.12). 월별 절감 추이 + 누적 stat. */
 export default function ReportScreen() {
-  const { report, bars, co2, monthLabel, canPrev, canNext, prevMonth, nextMonth } = useReport();
+  const { report, bars, co2, monthLabel, canPrev, canNext, prevMonth, nextMonth, loading } =
+    useReport();
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.safe, styles.center]} edges={['top']}>
+        <ActivityIndicator color={color.brand} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -42,7 +53,6 @@ export default function ReportScreen() {
               <Text style={styles.heroValue}>{report.saved}</Text>
               <Text style={styles.heroUnit}>kg</Text>
             </View>
-            <Text style={styles.heroSub}>누적 12.4kg · 지난달보다 늘었어요</Text>
           </View>
           <ProgressRing
             size={94}
@@ -85,7 +95,7 @@ export default function ReportScreen() {
                   style={[
                     styles.bar,
                     {
-                      height: `${b.h}%`,
+                      height: Math.max(4, Math.round((b.h / 100) * CHART_H)),
                       backgroundColor: b.isCurrent ? color.brand : color.ecoBorder,
                     },
                   ]}
@@ -122,6 +132,7 @@ function StatCard({ icon, value, unit, label }: StatCardProps) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: color.appBg },
+  center: { alignItems: 'center', justifyContent: 'center' },
   header: { paddingHorizontal: space.screenX, paddingTop: space.sm, paddingBottom: space.x2 },
   title: {
     fontSize: font.size.h2,
@@ -184,13 +195,6 @@ const styles = StyleSheet.create({
     fontFamily: font.family.semibold,
     color: color.white,
     marginLeft: 2,
-  },
-  heroSub: {
-    fontSize: font.size.micro,
-    fontFamily: font.family.semibold,
-    color: color.onBrandDim,
-    marginTop: space.md,
-    letterSpacing: font.tracking.snug,
   },
   ringInner: {
     width: 72,
@@ -280,16 +284,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    height: 120,
     gap: space.x2,
   },
   barCol: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    height: '100%',
     gap: space.md,
   },
-  bar: { width: '100%', maxWidth: 30, borderRadius: radius.chip },
+  bar: { width: '100%', maxWidth: 40, borderRadius: radius.chip },
   barLabel: { fontSize: font.size.tiny, fontFamily: font.family.semibold, color: color.textFaint },
 });

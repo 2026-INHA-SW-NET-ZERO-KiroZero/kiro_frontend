@@ -18,6 +18,7 @@ export { usePastMeetings, usePastMeeting } from './usePastMeetings';
 export { usePartyPool } from './usePartyPool';
 export { useReport } from './useReport';
 export type { ReportBar, ReportView, UseReportResult } from './useReport';
+export { useResultTotal } from './useResultTotal';
 export { useAuth, AuthContext } from './useAuth';
 export { useProfile, ProfileContext, useProfileProvider } from './useProfile';
 export { usePastEval, PastEvalContext, usePastEvalProvider } from './usePastEval';

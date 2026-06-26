@@ -1,9 +1,28 @@
-/** 현재 사용자 프로필 데이터 훅. (API 교체 지점: `GET /me`) */
-import { me } from '@/data';
-import type { DataResult, Me } from '@/types';
+/** 현재 사용자 프로필 데이터 훅. (`GET /api/v1/auth/me` → `CurrentUserResponse`) */
+import { useCallback } from 'react';
 
-import { useSeedValue } from './useSeed';
+import { apiRequest } from '@/lib/apiClient';
+import { formatWon } from '@/lib/format';
+import { SKILL_TO_LABEL } from '@/types';
+import type { CurrentUserResponse, Me } from '@/types';
 
-export function useMe(): DataResult<Me> {
-  return useSeedValue(me);
+import { useApiData } from './useApiData';
+import type { AsyncResult } from './useApiData';
+
+function toMe(res: CurrentUserResponse): Me {
+  return {
+    nickname: res.nickname,
+    email: res.email,
+    skill: SKILL_TO_LABEL[res.cookingSkill],
+    allergy: res.allergyTags,
+    leaves: formatWon(res.cash),
+  };
+}
+
+export function useMe(): AsyncResult<Me | null> {
+  const fetcher = useCallback(
+    async (): Promise<Me | null> => toMe(await apiRequest<CurrentUserResponse>('/auth/me')),
+    [],
+  );
+  return useApiData<Me | null>(fetcher, { initial: null, isEmpty: (d) => d === null });
 }

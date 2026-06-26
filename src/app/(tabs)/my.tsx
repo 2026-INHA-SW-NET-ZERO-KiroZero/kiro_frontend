@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
@@ -10,36 +10,41 @@ import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
 /** MY 화면 (PRD §3.13). 프로필 요약 + 절감/숙련도/알레르기 + 활동 진입. */
 export default function MyScreen() {
-  const { data: me } = useMe();
+  const { data: me, loading: meLoading } = useMe();
   const { currentSaved } = useReport();
   const { skillLevel, allergies } = useProfile();
   const { data: allergyOptions } = useAllergyOptions();
   const { logout } = useAuth();
 
-  const allergyChips = allergyOptions.filter((a) => allergies.includes(a.label));
+  const allergyChips = allergyOptions.filter((a) => allergies.includes(a.tag));
 
   const onLogout = async () => {
     await logout();
     router.replace('/(auth)/login');
   };
 
+  if (meLoading || me === null) {
+    return (
+      <SafeAreaView style={[styles.safe, styles.center]} edges={['top']}>
+        <ActivityIndicator color={color.brand} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>MY</Text>
-        <View style={styles.headerIcons}>
-          <Icon name="search" size={25} color={color.ink} />
-          <Pressable onPress={() => router.push('/notifications')} hitSlop={8}>
-            <Icon name="notifications" size={25} color={color.ink} />
-          </Pressable>
-        </View>
+        <Pressable onPress={() => router.push('/notifications')} hitSlop={8}>
+          <Icon name="notifications" size={25} color={color.ink} />
+        </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* 프로필 행 */}
         <View style={styles.profileRow}>
           <View style={styles.profileText}>
-            <Text style={styles.name}>{me.name}</Text>
+            <Text style={styles.name}>{me.nickname}</Text>
           </View>
           <Pressable onPress={() => router.push('/editProfile')} hitSlop={6} style={styles.editBtn}>
             <Text style={styles.editBtnText}>프로필 수정</Text>
@@ -89,10 +94,8 @@ export default function MyScreen() {
           {allergyChips.length > 0 ? (
             <View style={styles.allergyChips}>
               {allergyChips.map((a) => (
-                <View key={a.label} style={styles.allergyChip}>
-                  <Text style={styles.allergyChipText}>
-                    {a.emoji} {a.label}
-                  </Text>
+                <View key={a.tag} style={styles.allergyChip}>
+                  <Text style={styles.allergyChipText}>{a.label}</Text>
                 </View>
               ))}
             </View>
@@ -130,6 +133,7 @@ export default function MyScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: color.appBg },
+  center: { alignItems: 'center', justifyContent: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -144,7 +148,6 @@ const styles = StyleSheet.create({
     color: color.ink,
     letterSpacing: font.tracking.tightH,
   },
-  headerIcons: { flexDirection: 'row', alignItems: 'center', gap: space.x5 },
   scroll: { paddingHorizontal: space.screenX, paddingBottom: space.x10 },
 
   profileRow: {
@@ -156,7 +159,7 @@ const styles = StyleSheet.create({
   },
   profileText: { flex: 1, minWidth: 0 },
   name: {
-    fontSize: font.size.h1,
+    fontSize: font.size.h3,
     fontFamily: font.family.bold,
     color: color.ink,
     letterSpacing: font.tracking.tightH,

@@ -77,11 +77,13 @@ src/
 
 - `src/data/`의 시드를 **직접 import 금지**. 반드시 `useRooms()`, `useRoomDetail(id)`, `useNotifications()` 같은 훅으로 감싼다.
 - 훅이 로딩/에러/빈 상태를 반환하도록 설계해, 백엔드 연동 시 훅 내부만 API 호출로 교체한다(PRD §5).
+- **동기 시드**는 `useSeed`(`useSeedValue`/`useSeedList`/`useSeedFind`)로, **비동기 API**는 `useApiData(fetcher, { initial, isEmpty })`로 감싼다. 둘 다 동일한 `DataResult<T>`(+`refetch`) shape를 반환하므로 화면 분기는 그대로다. `useApiData`는 마운트 시 1회 fetch하고 setState는 비동기 콜백에서만 호출한다(effect 동기 setState 금지 규칙 준수). `fetcher`는 호출 측에서 `useCallback`으로 고정한다.
+- 연동 완료 예시(2026-06-27): `useMe`(`GET /auth/me`), `useAllergyOptions`(`GET /allergy-tags`), `useResultTotal`/`useReport`(`GET /me/results/total`), 프로필 저장 `useProfile.save`(`PUT /me/profile` → `useMe.refetch`). 알레르기 식별자는 **tag 문자열**로 통일(저장 시 변환 불필요).
 - **API 연동은 반드시 `docs/API-INTEGRATION.md` 절차를 따른다**: 코드 작성 전 백엔드 Swagger를 먼저 확인하고 `docs/generated/api-schema.md`와 대조해 **일치할 때만** 구현한다. 불일치를 추측으로 메우지 않는다.
 
 ## 7. 검증·표기·표시 유틸 (PRD §4.3 · §7 — `src/lib/`)
 
-- **환급 점수·환급 나뭇잎·리포트 co2는 프론트에서 계산하지 않는다 → 백엔드 계산값을 받아온다.** (`derive.ts` 미생성)
+- **환급 점수·환급 나뭇잎·리포트 co2는 프론트에서 계산하지 않는다 → 백엔드 계산값을 받아온다.** (`derive.ts` 미생성) "나뭇잎"은 백엔드 `cash`(누적 환불 적립금)를 표기한 것(`useMe`에서 `formatWon(cash)` → `me.leaves`). 리포트 누적/월별·소진율은 `GET /me/results/total`의 값을 그대로 표시한다.
 - 이메일 도메인 = `/@(inha\.ac\.kr|inha\.edu)$/i` → `validators.checkInhaEmail` (안내 카피는 PRD §3.2 그대로).
 - 폼 검증(login / signup / join 재료행 / vote)은 `validators.ts`에 순수 함수로 모음.
 - 돈 표기 = `value.toLocaleString('ko-KR') + '원'` → `format.formatWon`.
