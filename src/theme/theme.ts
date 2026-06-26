@@ -78,6 +78,7 @@ export const color = {
   disabledBg: '#EFEAE4', // 비활성 버튼 배경
   disabledText: '#B8AFA4', // 비활성 버튼 텍스트
   scrim: 'rgba(20,12,6,0.42)', // bottom-sheet backdrop
+  scrimSoft: 'rgba(20,16,12,0.14)', // notification dropdown dim layer
 
   // ---- Borders & hairlines ----
   border: '#F1EAE2', // default card border
