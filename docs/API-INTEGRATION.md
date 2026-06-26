@@ -6,7 +6,13 @@
 ## 언제 적용하나
 
 `src/hooks/`·`src/features/*/hooks/`의 커스텀 훅 내부(더미데이터 반환부)를 실제 API 호출로 바꾸는 모든 작업.
-백엔드 Swagger 주소가 확보된 뒤에만 시작한다(현재는 백엔드 미완성 — 주소 확보 전까지 더미데이터 유지).
+백엔드 Swagger 주소가 확보된 뒤에만 시작한다.
+
+### 백엔드 Swagger 주소
+
+- Swagger UI: https://umc-lxd.shop/swagger-ui/index.html
+- OpenAPI JSON: https://umc-lxd.shop/v3/api-docs
+- 상태(2026-06-27 확인): 서버는 살아있으나 `paths`가 비어 있음(엔드포인트 0개, title `Kiro Backend API` v1.0.0). **백엔드 미완성 단계 — 엔드포인트가 채워지기 전까지 더미데이터 유지.**
 
 ## 필수 절차 (순서 고정)
 
