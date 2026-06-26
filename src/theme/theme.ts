@@ -300,6 +300,20 @@ export const calendarTile = {
   weekdayWeekday: color.textFaint3, // #B5ADA4 평일 요일
 } as const;
 
+/**
+ * 신청 내역(myApplication) 투표/결과 단계 전용 색 (dc.html `myApplication`).
+ * 핸드오프에 등장하나 `color`에 없던 값들 — 하드코딩 대신 여기 모아 토큰화한다.
+ */
+export const applicationStage = {
+  votingBannerText: '#B53A2A', // voting 빨강 배너 본문 텍스트
+  eSelBg: '#FBEFE9', // E(재추천) 옵션 선택 시 카드 배경
+  eRingIdle: '#D8CFC6', // E 옵션 미선택 라디오 링
+  reasonBorder: '#F4D7C9', // 재추천 사유 입력 박스 테두리
+  voteBtnDisabled: '#E7C9B6', // 투표 CTA 비활성 배경
+  decidedVotes: '#B5764A', // result 결정 메뉴 득표·조리 라인 텍스트
+  roleDotIdle: '#C9BFB4', // 역할 분배 카드 '나' 외 참여자 아바타 점
+} as const;
+
 /** Skill (요리 실력/숙련도) → chip color. */
 export const skillChip = {
   상: { fg: '#1F8676', bg: color.ecoBgSoft },

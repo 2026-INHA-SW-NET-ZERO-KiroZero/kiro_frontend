@@ -1,7 +1,7 @@
 # 컴포넌트 인벤토리 (자동 생성)
 
 > 자동 생성 파일 — 직접 수정 금지. `/gc`·`/health`·kiro-build가 코드를 스캔해 갱신한다.
-> 홈(`features/home`)·알림(`features/notifications`)은 실제 화면으로 구현됨(issue #9, #15). 나머지 탭/스택은 아직 placeholder.
+> 홈(`features/home`)·내 모임(`features/meetings`)·알림(`features/notifications`)은 실제 화면으로 구현됨(issue #9, #12, #15). 나머지 탭/스택은 아직 placeholder.
 
 ## 공용 컴포넌트 (`src/components/`)
 
@@ -31,10 +31,14 @@
 | ------------------- | ---------------------------------------------------- | ------------- | -------- | ------------------------- |
 | HomeScreen          | `src/features/home/HomeScreen.tsx`                   | 혼합형(훅+UI) | 0        | `(tabs)/home` 라우트      |
 | LocationSheet       | `src/features/home/LocationSheet.tsx`                | 프레젠테이션  | 4        | HomeScreen (지역 필터)    |
+| MeetingsScreen      | `src/features/meetings/MeetingsScreen.tsx`           | 혼합형(훅+UI) | 0        | `(tabs)/meetings` 라우트  |
+| MyApplicationScreen | `src/features/meetings/MyApplicationScreen.tsx`      | 혼합형(훅+UI) | 0        | `myApplication` 라우트    |
 | NotifDropdown       | `src/features/notifications/NotifDropdown.tsx`       | 오버레이      | 3        | HomeScreen (탑바 벨 토글) |
 | NotificationsScreen | `src/features/notifications/NotificationsScreen.tsx` | 혼합형(훅+UI) | 0        | `notifications` 라우트    |
 
 > HomeScreen: `useNotifications()`의 `unreadCount`로 미읽음 dot 표시, 벨 탭 시 NotifDropdown 토글.
+> MeetingsScreen(PRD §3.8): `useMyApplications()`·`usePastMeetings()`·`useNotifications()` 훅 경유. 캘린더 그리드는 `src/features/meetings/calendar.ts`(순수 함수).
+> MyApplicationScreen(PRD §3.9): `useMyApplication(id)`·`usePartyPool()`·`useVoteMenus()`·`useDecidedMenu()` 훅 경유. stage(canceled/recruiting/voting/result)는 화면 로컬 파생. theme `applicationStage` 토큰 그룹(투표/결과 단계 전용 색).
 > NotifDropdown props: `visible` · `onClose` · `onOpenPage`. 최대 5행, popIn 200ms 애니메이션.
 > NotificationsScreen: 전체 알림 목록, "모두 읽음" 버튼, 타입별 라우팅(eval→pastEval, 그 외→myApplication).
 
