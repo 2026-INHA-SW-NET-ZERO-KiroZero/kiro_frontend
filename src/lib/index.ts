@@ -13,6 +13,7 @@ export {
 export type { EmailValidity, EmailFeedback } from './validators';
 export { formatWon } from './format';
 export { roomDisplay } from './roomDisplay';
+export { tokenStorage } from './tokenStorage';
 export type {
   RoomState,
   StatusBadgeKey,
