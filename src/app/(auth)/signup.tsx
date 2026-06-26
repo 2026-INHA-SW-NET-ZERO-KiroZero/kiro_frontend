@@ -9,7 +9,7 @@ import { TextField } from '@/components/TextField';
 import { ToggleChip } from '@/components/ToggleChip';
 import { useAuthApi } from '@/hooks/useAuthApi';
 import { ApiError } from '@/lib/apiClient';
-import { checkInhaEmail, isSignupFormValid } from '@/lib/validators';
+import { checkInhaEmail, isPasswordValid, isSignupFormValid } from '@/lib/validators';
 import { color, font, space } from '@/theme/theme';
 import { SKILL_TO_LABEL, SKILL_TO_SERVER } from '@/types';
 import type { AllergyTagItemResponse, CookingSkill } from '@/types';
@@ -128,8 +128,15 @@ export default function SignupScreen() {
           <TextField
             value={password}
             onChangeText={setPassword}
-            placeholder="비밀번호를 입력하세요"
+            placeholder="8자 이상 입력하세요"
             secureTextEntry
+            borderState={password.length > 0 && !isPasswordValid(password) ? 'error' : 'default'}
+            feedbackMessage={
+              password.length > 0 && !isPasswordValid(password)
+                ? '비밀번호는 8자 이상이어야 해요'
+                : null
+            }
+            feedbackType="error"
           />
         </View>
 
