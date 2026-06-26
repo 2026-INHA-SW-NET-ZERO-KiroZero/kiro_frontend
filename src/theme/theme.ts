@@ -62,10 +62,17 @@ export const color = {
   white: '#FFFFFF',
   bezel: '#16110D', // phone frame / home indicator
 
+  // ---- State ----
+  disabledBg: '#EFEAE4', // 비활성 버튼 배경
+  disabledText: '#B8AFA4', // 비활성 버튼 텍스트
+  scrim: 'rgba(20,12,6,0.42)', // bottom-sheet backdrop
+
   // ---- Borders & hairlines ----
   border: '#F1EAE2', // default card border
   borderInput: '#ECE5DD', // input border
   borderInput2: '#EAE3DB',
+  brandOutlineBorder: '#F2D7CC', // outline 버튼 테두리
+  grabber: '#E7DFD5', // bottom-sheet grabber
   hair: '#F7F2EC', // list row separators
   hair2: '#F4EEE7',
   hair3: '#F5EFE8',
