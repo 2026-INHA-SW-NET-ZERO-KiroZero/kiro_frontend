@@ -25,6 +25,7 @@
     "react-native-svg": "15.15.4"
   },
   "devDependencies": {
+    "@react-native/jest-preset": "^0.85.3",
     "@types/react": "~19.2.2",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",

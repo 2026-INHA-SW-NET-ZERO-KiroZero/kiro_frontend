@@ -5,7 +5,8 @@
 export { useMe } from './useMe';
 export { useAllergyOptions } from './useAllergyOptions';
 export { useRooms, useRoomDetail } from './useRooms';
-export { useAggIngredients } from './useIngredients';
+export { useAggIngredients } from './useAggIngredients';
+export { useIngredients } from './useIngredients';
 export { useMenuCandidates, useVoteMenus, useDecidedMenu } from './useMenus';
 export { useNotifications } from './useNotifications';
 export { useMyApplications, useMyApplication } from './useMyApplications';
