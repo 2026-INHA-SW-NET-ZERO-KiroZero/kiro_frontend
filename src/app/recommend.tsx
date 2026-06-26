@@ -1,6 +1,6 @@
 /**
  * AI 추천 메뉴 화면 (PRD §3.5).
- * 헤더 → 크림 점수기준 info 카드 → 메뉴 후보 3개 카드(랭크칩·점수·점수바·재료칩·선택 버튼).
+ * 헤더 → 크림 info 카드 → 메뉴 후보 3개 카드(랭크칩·이모지·이름·시간·난이도·재료칩·선택 버튼).
  * 데이터는 useMenuCandidates() 훅 경유.
  */
 import { useRouter } from 'expo-router';
@@ -13,12 +13,6 @@ import { Button, Icon } from '@/components';
 import { useMenuCandidates } from '@/hooks/useMenus';
 import type { MenuCandidate } from '@/types';
 import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
-
-function barColor(score: number): string {
-  if (score >= 90) return color.eco;
-  if (score >= 85) return color.gold;
-  return color.textFaint;
-}
 
 export default function RecommendScreen() {
   const router = useRouter();
@@ -83,18 +77,12 @@ function MenuCard({
   const isBest = rank === 0;
   return (
     <View style={[styles.card, selected && styles.cardSelected]}>
-      <View style={styles.cardTop}>
-        <View style={[styles.rankChip, isBest ? styles.rankChipBest : styles.rankChipAlt]}>
-          <Text
-            style={[styles.rankChipText, isBest ? styles.rankChipTextBest : styles.rankChipTextAlt]}
-          >
-            {isBest ? 'BEST 추천' : `후보 ${rank + 1}`}
-          </Text>
-        </View>
-        <View style={styles.scoreWrap}>
-          <Text style={styles.scoreNum}>{menu.score}</Text>
-          <Text style={styles.scoreUnit}>점</Text>
-        </View>
+      <View style={[styles.rankChip, isBest ? styles.rankChipBest : styles.rankChipAlt]}>
+        <Text
+          style={[styles.rankChipText, isBest ? styles.rankChipTextBest : styles.rankChipTextAlt]}
+        >
+          {isBest ? 'BEST 추천' : `후보 ${rank + 1}`}
+        </Text>
       </View>
 
       <View style={styles.titleRow}>
@@ -107,15 +95,6 @@ function MenuCard({
             ⏱ {menu.time} · {menu.diff}
           </Text>
         </View>
-      </View>
-
-      <View style={styles.barTrack}>
-        <View
-          style={[
-            styles.barFill,
-            { width: `${menu.score}%`, backgroundColor: barColor(menu.score) },
-          ]}
-        />
       </View>
 
       <Text style={styles.desc}>{menu.desc}</Text>
@@ -222,15 +201,11 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: color.eco,
   },
-  cardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
   rankChip: {
     paddingVertical: space.xs,
     paddingHorizontal: space.lg,
     borderRadius: radius.pill,
+    marginBottom: space.x4,
   },
   rankChipBest: {
     backgroundColor: color.ecoBgSoft,
@@ -249,27 +224,10 @@ const styles = StyleSheet.create({
   rankChipTextAlt: {
     color: color.textMute,
   },
-  scoreWrap: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 2,
-  },
-  scoreNum: {
-    fontSize: font.size.h2,
-    fontFamily: font.family.bold,
-    color: color.ink,
-    letterSpacing: font.tracking.tight,
-  },
-  scoreUnit: {
-    fontSize: font.size.sm,
-    fontFamily: font.family.semibold,
-    color: color.ink,
-  },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.x2,
-    marginTop: space.x4,
   },
   emojiTile: {
     width: 40,
@@ -297,17 +255,6 @@ const styles = StyleSheet.create({
     fontFamily: font.family.medium,
     color: color.textMute,
     letterSpacing: font.tracking.snug,
-  },
-  barTrack: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: color.greyChipBg,
-    marginTop: space.x4,
-    overflow: 'hidden',
-  },
-  barFill: {
-    height: 6,
-    borderRadius: 3,
   },
   desc: {
     fontSize: font.size.body,

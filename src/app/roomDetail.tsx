@@ -27,9 +27,9 @@ export default function RoomDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const [heroStatus, setHeroStatus] = useState<RoomState>('OPEN');
+  const [heroStatus] = useState<RoomState>('OPEN');
+  const [hasMenu] = useState(false);
   const [joined, setJoined] = useState(false);
-  const [hasMenu, setHasMenu] = useState(false);
   const [showJoinSheet, setShowJoinSheet] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(null);
 
@@ -83,26 +83,6 @@ export default function RoomDetailScreen() {
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       {/* 개발용 상태 토글 — 상단 고정 */}
-      <View style={styles.devToggle}>
-        {(['OPEN', 'CONFIRMED', 'COOKED'] as RoomState[]).map((s) => (
-          <Pressable
-            key={s}
-            onPress={() => setHeroStatus(s)}
-            style={[styles.devBtn, heroStatus === s && styles.devBtnActive]}
-          >
-            <Text style={[styles.devBtnText, heroStatus === s && styles.devBtnTextActive]}>
-              {s}
-            </Text>
-          </Pressable>
-        ))}
-        <Pressable
-          onPress={() => setHasMenu((v) => !v)}
-          style={[styles.devBtn, hasMenu && styles.devBtnActive]}
-        >
-          <Text style={[styles.devBtnText, hasMenu && styles.devBtnTextActive]}>MENU</Text>
-        </Pressable>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* 1. Hero */}
         <View style={styles.heroContainer}>
@@ -219,9 +199,7 @@ export default function RoomDetailScreen() {
                   <View style={styles.chipRow}>
                     {profile.bring.map((b, bi) => (
                       <View key={bi} style={styles.bringChip}>
-                        <Text style={styles.bringChipText}>
-                          {b.e} {b.n}
-                        </Text>
+                        <Text style={styles.bringChipText}>{b.n}</Text>
                       </View>
                     ))}
                   </View>
@@ -347,32 +325,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 120,
-  },
-
-  // 개발용 토글
-  devToggle: {
-    flexDirection: 'row',
-    gap: space.sm,
-    paddingHorizontal: space.screenX,
-    paddingVertical: space.md,
-    backgroundColor: color.appBg,
-  },
-  devBtn: {
-    paddingHorizontal: space.lg,
-    paddingVertical: space.xs,
-    borderRadius: radius.chip,
-    backgroundColor: color.greyChipBg,
-  },
-  devBtnActive: {
-    backgroundColor: color.brand,
-  },
-  devBtnText: {
-    fontSize: font.size.tiny,
-    fontFamily: font.family.bold,
-    color: color.textMute,
-  },
-  devBtnTextActive: {
-    color: color.white,
   },
 
   // 1. Hero
