@@ -1,0 +1,21 @@
+#!/bin/bash
+# Pre-push hook: harness 검증(lint + typecheck + format — 테스트 제외) + Claude docs 정합성 점검 안내
+# 실패 시 푸시 차단
+#
+# 활성화: git config core.hooksPath .githooks  (레포당 1회)
+
+echo "🔍 Pre-push: lint + typecheck + format harness 검증 실행 중... (테스트 제외)"
+
+npm run harness --silent
+
+if [ $? -ne 0 ]; then
+    echo "❌ Harness 검증 실패. 모든 검증을 통과한 후 다시 푸시하세요."
+    echo "   npm run harness 를 실행하여 상세 결과를 확인하세요."
+    exit 1
+fi
+
+echo "✅ Pre-push: harness 검증 통과 (lint / typecheck / format)"
+echo ""
+echo "💡 push 전에 docs 동기화를 점검하려면 Claude에게 'pre-push-check' 스킬을 요청하세요."
+echo "   - 이번 push의 코드 변경(라우트·화면·컴포넌트·디자인 토큰·API 호출)이 docs/ 에 반영됐는지 점검"
+echo "   - 누락 시 문서 수정안 제안 (코드 자동 수정 없음, 적용 전 확인)"

@@ -45,6 +45,7 @@
 
 - 파일 저장 시 **PostToolUse Hook**이 자동 `eslint --fix` + `tsc`. 에러는 컨텍스트에 주입되니 **스스로 수정**한다.
 - 같은 규칙이 3회+ 반복되면 `harness-feedback`로 규칙을 승격(문서→린트→교정지시→구조테스트).
+- **push 직전**: `.githooks/pre-push`가 `npm run harness`(lint+typecheck+format, **테스트 제외**)를 돌려 실패 시 차단. 그 후 `pre-push-check` 스킬로 **docs 동기화**를 점검한다(코드 변경이 `docs/`에 반영됐는지). 활성화는 레포당 1회 `git config core.hooksPath .githooks`.
 
 ## 현재 작업
 
