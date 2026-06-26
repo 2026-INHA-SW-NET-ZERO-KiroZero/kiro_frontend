@@ -1,0 +1,16 @@
+/** 공유 타입 barrel (PRD §5 shape). UI/훅/스토어는 여기서 import한다. */
+export type { SkillLevel, Me, AllergyOption } from './user';
+export type { RoomParticipant, Room, AggIngredient, PartyBring, PartyProfile } from './room';
+export type {
+  IngredientNeed,
+  Purchase,
+  MenuCandidate,
+  VoteMenu,
+  MenuRole,
+  DecidedMenu,
+} from './menu';
+export type { NotifType, NotifTone, Notif } from './notification';
+export type { MyApplication } from './application';
+export type { SettleItem, Debtor, Settlement } from './settlement';
+export type { PastMenu, SeedEval, PastPart, PastMeeting } from './meeting';
+export type { DataResult } from './query';

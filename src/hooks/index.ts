@@ -1,0 +1,14 @@
+/**
+ * 데이터 접근 커스텀 훅 barrel. UI는 `src/data/`를 직접 import하지 않고
+ * 여기 훅으로만 데이터에 접근한다(API 교체 대비, PRD §5).
+ */
+export { useMe } from './useMe';
+export { useAllergyOptions } from './useAllergyOptions';
+export { useRooms, useRoomDetail } from './useRooms';
+export { useAggIngredients } from './useIngredients';
+export { useMenuCandidates, useVoteMenus, useDecidedMenu } from './useMenus';
+export { useNotifications } from './useNotifications';
+export { useMyApplications, useMyApplication } from './useMyApplications';
+export { useSettlement } from './useSettlement';
+export { usePastMeetings, usePastMeeting } from './usePastMeetings';
+export { usePartyPool } from './usePartyPool';
