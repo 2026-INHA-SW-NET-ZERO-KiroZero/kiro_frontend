@@ -2,26 +2,43 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Button, Icon, SheetBase } from '@/components';
+import { searchIngredients } from '@/lib/ingredientApi';
 import { color, font, radius, space } from '@/theme/theme';
+import type { JoinIngredientRequest, JoinSlotRequest } from '@/types';
 
-type JoinRow = { name: string; count: string; gram: string };
+type JoinRow = {
+  ingredientId: number | null;
+  nameKo: string;
+  nameInput: string;
+  count: string;
+  gram: string;
+  error: string | null;
+};
 
 type JoinSheetProps = {
   visible: boolean;
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (payload: JoinSlotRequest) => void;
 };
 
-const EMPTY_ROW: JoinRow = { name: '', count: '', gram: '' };
+const EMPTY_ROW: JoinRow = {
+  ingredientId: null,
+  nameKo: '',
+  nameInput: '',
+  count: '',
+  gram: '',
+  error: null,
+};
 
 export function JoinSheet({ visible, onClose, onSubmit }: JoinSheetProps) {
   const [rows, setRows] = useState<JoinRow[]>([{ ...EMPTY_ROW }]);
   const [extraPossible, setExtraPossible] = useState(false);
 
-  const canSubmit = rows.some((r) => r.name.trim() && r.count.trim());
+  const confirmedRows = rows.filter((r) => r.ingredientId !== null && r.count.trim());
+  const canSubmit = confirmedRows.length > 0;
 
-  function updateRow(index: number, key: keyof JoinRow, value: string) {
-    setRows((prev) => prev.map((r, i) => (i === index ? { ...r, [key]: value } : r)));
+  function updateRow(index: number, patch: Partial<JoinRow>) {
+    setRows((prev) => prev.map((r, i) => (i === index ? { ...r, ...patch } : r)));
   }
 
   function addRow() {
@@ -32,6 +49,46 @@ export function JoinSheet({ visible, onClose, onSubmit }: JoinSheetProps) {
     setRows((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function handleNameSubmit(index: number) {
+    const keyword = rows[index].nameInput.trim();
+    if (!keyword) return;
+    searchIngredients(keyword)
+      .then((res) => {
+        const match = res.ingredients[0];
+        if (match) {
+          updateRow(index, {
+            ingredientId: match.ingredientId,
+            nameKo: match.nameKo,
+            error: null,
+          });
+        } else {
+          updateRow(index, {
+            ingredientId: null,
+            nameKo: '',
+            nameInput: '',
+            error: '존재하지 않는 재료예요',
+          });
+        }
+      })
+      .catch(() => {
+        updateRow(index, {
+          ingredientId: null,
+          nameKo: '',
+          nameInput: '',
+          error: '존재하지 않는 재료예요',
+        });
+      });
+  }
+
+  function handleSubmit() {
+    const ingredients: JoinIngredientRequest[] = confirmedRows.map((r) => ({
+      ingredientId: r.ingredientId as number,
+      count: Number(r.count),
+      ...(r.gram.trim() ? { knownGrams: Number(r.gram) } : {}),
+    }));
+    onSubmit({ canPurchase: extraPossible, ingredients });
+  }
+
   return (
     <SheetBase visible={visible} onClose={onClose} title="가져갈 재료">
       <ScrollView
@@ -40,35 +97,59 @@ export function JoinSheet({ visible, onClose, onSubmit }: JoinSheetProps) {
         showsVerticalScrollIndicator={false}
       >
         {rows.map((row, index) => (
-          <View key={index} style={styles.row}>
-            <TextInput
-              style={[styles.input, styles.inputName]}
-              value={row.name}
-              onChangeText={(v) => updateRow(index, 'name', v)}
-              placeholder="재료명"
-              placeholderTextColor={color.placeholder}
-            />
-            <TextInput
-              style={[styles.input, styles.inputCount]}
-              value={row.count}
-              onChangeText={(v) => updateRow(index, 'count', v)}
-              placeholder="개수 *"
-              placeholderTextColor={color.placeholder}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={[styles.input, styles.inputGram]}
-              value={row.gram}
-              onChangeText={(v) => updateRow(index, 'gram', v)}
-              placeholder="g"
-              placeholderTextColor={color.placeholder}
-              keyboardType="numeric"
-            />
-            {rows.length > 1 ? (
-              <Pressable style={styles.removeBtn} onPress={() => removeRow(index)} hitSlop={6}>
-                <Icon name="close" size={18} color={color.iconFaint} />
-              </Pressable>
-            ) : null}
+          <View key={index} style={styles.rowWrapper}>
+            <View style={styles.row}>
+              <View style={styles.nameInputWrapper}>
+                <TextInput
+                  style={[
+                    styles.input,
+                    styles.inputName,
+                    row.ingredientId !== null && styles.inputConfirmed,
+                    row.error !== null && styles.inputError,
+                  ]}
+                  value={row.ingredientId !== null ? row.nameKo : row.nameInput}
+                  onChangeText={(v) =>
+                    updateRow(index, { nameInput: v, ingredientId: null, nameKo: '', error: null })
+                  }
+                  onSubmitEditing={() => handleNameSubmit(index)}
+                  placeholder="재료명 입력 후 엔터"
+                  placeholderTextColor={color.placeholder}
+                  returnKeyType="done"
+                  editable={row.ingredientId === null}
+                />
+                {row.ingredientId !== null ? (
+                  <Pressable
+                    style={styles.clearBtn}
+                    onPress={() => updateRow(index, { ...EMPTY_ROW })}
+                    hitSlop={6}
+                  >
+                    <Icon name="close" size={14} color={color.textFaint} />
+                  </Pressable>
+                ) : null}
+              </View>
+              <TextInput
+                style={[styles.input, styles.inputCount]}
+                value={row.count}
+                onChangeText={(v) => updateRow(index, { count: v })}
+                placeholder="개수 *"
+                placeholderTextColor={color.placeholder}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={[styles.input, styles.inputGram]}
+                value={row.gram}
+                onChangeText={(v) => updateRow(index, { gram: v })}
+                placeholder="g"
+                placeholderTextColor={color.placeholder}
+                keyboardType="numeric"
+              />
+              {rows.length > 1 ? (
+                <Pressable style={styles.removeBtn} onPress={() => removeRow(index)} hitSlop={6}>
+                  <Icon name="close" size={18} color={color.iconFaint} />
+                </Pressable>
+              ) : null}
+            </View>
+            {row.error !== null ? <Text style={styles.errorText}>{row.error}</Text> : null}
           </View>
         ))}
 
@@ -94,7 +175,12 @@ export function JoinSheet({ visible, onClose, onSubmit }: JoinSheetProps) {
 
         <Text style={styles.feeNote}>이용 요금 2,000원이 차감돼요</Text>
 
-        <Button label="신청하기" onPress={onSubmit} disabled={!canSubmit} style={styles.submit} />
+        <Button
+          label="신청하기"
+          onPress={handleSubmit}
+          disabled={!canSubmit}
+          style={styles.submit}
+        />
       </ScrollView>
     </SheetBase>
   );
@@ -104,11 +190,17 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: space.md,
   },
+  rowWrapper: {
+    marginBottom: space.lg,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
-    marginBottom: space.lg,
+  },
+  nameInputWrapper: {
+    flex: 1,
+    position: 'relative',
   },
   input: {
     backgroundColor: color.appBgInput,
@@ -123,7 +215,15 @@ const styles = StyleSheet.create({
     letterSpacing: font.tracking.base,
   },
   inputName: {
-    flex: 1,
+    width: '100%',
+    paddingRight: space.x6,
+  },
+  inputConfirmed: {
+    borderColor: color.eco,
+    backgroundColor: color.ecoBgSoft,
+  },
+  inputError: {
+    borderColor: color.brandStrong,
   },
   inputCount: {
     width: 78,
@@ -133,9 +233,23 @@ const styles = StyleSheet.create({
     width: 58,
     textAlign: 'center',
   },
+  clearBtn: {
+    position: 'absolute',
+    right: space.x2,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
   removeBtn: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  errorText: {
+    marginTop: space.xs,
+    fontSize: font.size.cap,
+    fontFamily: font.family.medium,
+    color: color.brandStrong,
+    letterSpacing: font.tracking.base,
   },
   addRow: {
     flexDirection: 'row',

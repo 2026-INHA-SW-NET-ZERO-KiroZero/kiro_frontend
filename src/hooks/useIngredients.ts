@@ -1,9 +1,24 @@
-/** 재료 마스터 데이터 훅 — 사용자가 재료 등록 시 검색/선택하는 100종. */
-import { ingredients } from '@/data';
-import type { Ingredient, DataResult } from '@/types';
+import { useCallback } from 'react';
 
-import { useSeedList } from './useSeed';
+import { searchIngredients } from '@/lib/ingredientApi';
+import type { Ingredient, IngredientSearchResponse } from '@/types';
 
-export function useIngredients(): DataResult<Ingredient[]> {
-  return useSeedList(ingredients);
+import { useApiData, type AsyncResult } from './useApiData';
+
+function toIngredient(item: IngredientSearchResponse['ingredients'][number]): Ingredient {
+  return { id: item.ingredientId, nameKo: item.nameKo, gramsPerCount: item.gramsPerCount };
+}
+
+/** 재료 검색 훅. keyword가 빈 문자열이면 즉시 빈 배열 반환. */
+export function useIngredients(keyword: string): AsyncResult<Ingredient[]> {
+  const fetcher = useCallback((): Promise<Ingredient[]> => {
+    const trimmed = keyword.trim();
+    if (!trimmed) return Promise.resolve([]);
+    return searchIngredients(trimmed).then((res) => res.ingredients.map(toIngredient));
+  }, [keyword]);
+
+  return useApiData(fetcher, {
+    initial: [],
+    isEmpty: (data) => data.length === 0,
+  });
 }

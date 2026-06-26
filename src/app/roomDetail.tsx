@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { type ComponentProps, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,8 +10,9 @@ import { JoinSheet } from '@/features/roomDetail/JoinSheet';
 import { useAggIngredients } from '@/hooks/useAggIngredients';
 import { usePartyPool } from '@/hooks/usePartyPool';
 import { useRoomDetail } from '@/hooks/useRooms';
+import { joinSlot, leaveSlot } from '@/lib/slotApi';
 import { roomDisplay, type RoomState } from '@/lib/roomDisplay';
-import type { SkillLevel } from '@/types';
+import type { JoinSlotRequest, SkillLevel } from '@/types';
 import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
@@ -26,16 +27,22 @@ const ACCORDIONS = [
 export default function RoomDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { id } = useLocalSearchParams<{ id: string }>();
 
   const [heroStatus] = useState<RoomState>('OPEN');
   const [hasMenu] = useState(false);
-  const [joined, setJoined] = useState(false);
+  // null = API 값 사용, true/false = 로컬 낙관적 업데이트
+  const [joinedOverride, setJoinedOverride] = useState<boolean | null>(null);
   const [showJoinSheet, setShowJoinSheet] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(null);
 
-  const { data: room } = useRoomDetail('r1');
+  const { data: room } = useRoomDetail(id ?? '');
   const { data: partyPool } = usePartyPool();
   const { data: aggList } = useAggIngredients();
+
+  const slotId = Number(id);
+  // 로컬 override가 없으면 API 응답 joined 값을 사용
+  const joined = joinedOverride ?? room?.joined ?? false;
 
   // 신청 시 본인 인원이 추가되어 정원이 채워진다(3/4 → 4/4 매치 확정).
   const baseCount = room?.baseCount ?? 3;
@@ -68,7 +75,9 @@ export default function RoomDetailScreen() {
         setShowJoinSheet(true);
         break;
       case 'cancel':
-        setJoined(false);
+        leaveSlot(slotId)
+          .then(() => setJoinedOverride(false))
+          .catch(() => {});
         break;
       case 'recommend':
         router.push('/recommend');
@@ -313,14 +322,18 @@ export default function RoomDetailScreen() {
       <JoinSheet
         visible={showJoinSheet}
         onClose={() => setShowJoinSheet(false)}
-        onSubmit={() => {
-          setJoined(true);
-          setShowJoinSheet(false);
-          // 정원이 가득 차면(3/4 → 4/4) 매치 확정 → 투표 페이지로 이동.
-          const willBeFull = baseCount + 1 >= (room.capacity ?? 4);
-          if (willBeFull) {
-            router.push('/myApplication');
-          }
+        onSubmit={(payload: JoinSlotRequest) => {
+          joinSlot(slotId, payload)
+            .then(() => {
+              setJoinedOverride(true);
+              setShowJoinSheet(false);
+              // 정원이 가득 차면(3/4 → 4/4) 매치 확정 → 투표 페이지로 이동.
+              const willBeFull = baseCount + 1 >= (room.capacity ?? 4);
+              if (willBeFull) {
+                router.push('/myApplication');
+              }
+            })
+            .catch(() => {});
         }}
       />
     </SafeAreaView>
