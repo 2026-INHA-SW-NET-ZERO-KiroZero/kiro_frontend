@@ -229,6 +229,14 @@ export const shadow = {
     shadowRadius: 20,
     elevation: 10,
   },
+  // 0 9px 18px -7px rgba(255,68,61,.55) — home date strip selected tile
+  dateTile: {
+    shadowColor: '#FF443D',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 9,
+    elevation: 5,
+  },
   // 0 18px 44px -12px rgba(0,0,0,.34) — notification dropdown popover
   popover: {
     shadowColor: '#000',
@@ -248,6 +256,23 @@ export const statusChip = {
   confirmed: { fg: '#D6342D', bg: color.redBgSoft, label: '정원 마감 · 통합 완료' },
   cooked: { fg: '#6F665E', bg: color.greyChipBg, label: '조리 완료' },
   canceled: { fg: '#8C837B', bg: color.greyChipBg, label: '인원 미달 · 모집 취소' },
+} as const;
+
+/**
+ * 홈 날짜 스트립 타일 색 (dc.html 홈 line 156~178).
+ * 선택일(금)은 brand 채움 타일, 토=파랑·일=빨강 계열, 평일=ink.
+ * 요일 라벨의 연한 틴트 색은 프로토타입 고유 값이라 별도 토큰으로 보관한다.
+ */
+export const calendarTile = {
+  todayBg: color.brand, // #FF443D 선택일 채움
+  todayNum: color.white,
+  todayWeekday: '#FFDFD2', // 선택일 요일(연빨강)
+  satNum: color.blue, // #3B7DE0
+  satWeekday: '#9FB6DE', // 토요일 요일(연파랑)
+  sunNum: color.brandAlt, // #E5484D
+  sunWeekday: '#E7A6A8', // 일요일 요일(연빨강)
+  weekdayNum: color.ink2, // #3D362F
+  weekdayWeekday: color.textFaint3, // #B5ADA4 평일 요일
 } as const;
 
 /** Skill (요리 실력/숙련도) → chip color. */

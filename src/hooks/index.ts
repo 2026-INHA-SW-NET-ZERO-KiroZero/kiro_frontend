@@ -5,6 +5,8 @@
 export { useMe } from './useMe';
 export { useAllergyOptions } from './useAllergyOptions';
 export { useRooms, useRoomDetail } from './useRooms';
+export { useHomeRooms, toHomeRoomCard } from './useHomeRooms';
+export type { HomeRoomCard, HomeRoomAvatar, UseHomeRoomsResult } from './useHomeRooms';
 export { useAggIngredients } from './useAggIngredients';
 export { useIngredients } from './useIngredients';
 export { useMenuCandidates, useVoteMenus, useDecidedMenu } from './useMenus';

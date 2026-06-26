@@ -1,13 +1,39 @@
 # 컴포넌트 인벤토리 (자동 생성)
 
 > 자동 생성 파일 — 직접 수정 금지. `/gc`·`/health`·kiro-build가 코드를 스캔해 갱신한다.
-> 현재는 네비게이션 골격(issue #2)까지 진행된 상태. 화면은 placeholder이며, 후속 이슈에서 `features/{도메인}`의 실제 화면으로 교체된다.
+> 네비게이션 골격(issue #2) 이후 화면 구현 진행 중. 홈(`features/home`)은 placeholder에서 실제 화면으로 교체됨(issue #9). 나머지 탭/스택은 아직 placeholder.
 
 ## 공용 컴포넌트 (`src/components/`)
 
-| 컴포넌트    | 경로                             | 분류               | props 수 | 사용처                  |
-| ----------- | -------------------------------- | ------------------ | -------- | ----------------------- |
-| Placeholder | `src/components/Placeholder.tsx` | 프레젠테이션(골격) | 4        | 모든 placeholder 라우트 |
+| 컴포넌트             | 경로                              | 분류               | props 수 | 사용처                             |
+| -------------------- | --------------------------------- | ------------------ | -------- | ---------------------------------- |
+| Button               | `src/components/Button.tsx`       | 프레젠테이션       | 5        | 기본 버튼(primary/outline variant) |
+| Card                 | `src/components/Card.tsx`         | 프레젠테이션       | 3        | 흰 카드 컨테이너(테두리·그림자)    |
+| Chip / ToggleChip    | `src/components/Chip.tsx`         | 프레젠테이션       | 3 / 3    | 필터칩 / 토글 선택칩               |
+| Avatar / AvatarStack | `src/components/Avatar.tsx`       | 프레젠테이션       | 3 / 1    | 참여자 아바타 / 겹친 아바타 묶음   |
+| Icon                 | `src/components/Icon.tsx`         | 프레젠테이션       | 3        | Material 아이콘 래퍼               |
+| Input                | `src/components/Input.tsx`        | 프레젠테이션       | 7        | 텍스트 입력(라벨·에러)             |
+| FAB                  | `src/components/FAB.tsx`          | 프레젠테이션       | 2        | 플로팅 액션 버튼                   |
+| ProgressRing         | `src/components/ProgressRing.tsx` | 프레젠테이션       | 6        | 원형 진행률(탄소·리포트)           |
+| SectionSlab          | `src/components/SectionSlab.tsx`  | 프레젠테이션       | 2        | 섹션 구분 슬래브(8px)              |
+| Segmented            | `src/components/Segmented.tsx`    | 프레젠테이션       | 3        | 세그먼트 컨트롤(탭 전환)           |
+| SheetBase            | `src/components/SheetBase.tsx`    | 프레젠테이션       | 4        | 바텀시트 베이스                    |
+| SkillChip            | `src/components/SkillChip.tsx`    | 프레젠테이션       | 2        | 요리 실력 칩(상/중/하)             |
+| StatusBadge          | `src/components/StatusBadge.tsx`  | 프레젠테이션       | 3        | 홈 추천/열린 방 카드 배지          |
+| Placeholder          | `src/components/Placeholder.tsx`  | 프레젠테이션(골격) | 4        | 미구현 placeholder 라우트          |
+
+> StatusBadge: `size` prop으로 `'md'`(기본, 목록 카드 11px) / `'sm'`(추천 카드 10.5px·radius 7) 변형 지원.
+> SkillChip도 `size` prop(`'sm'`/`'md'`) 지원. 공용 컴포넌트 14종은 issue #7(commit 67557b3)에서 구현됨.
+
+## 화면 컴포넌트 (`src/features/`)
+
+| 컴포넌트      | 경로                                  | 분류          | props 수 | 사용처                 |
+| ------------- | ------------------------------------- | ------------- | -------- | ---------------------- |
+| HomeScreen    | `src/features/home/HomeScreen.tsx`    | 혼합형(훅+UI) | 0        | `(tabs)/home` 라우트   |
+| LocationSheet | `src/features/home/LocationSheet.tsx` | 프레젠테이션  | 4        | HomeScreen (지역 필터) |
+
+> HomeScreen은 `useHomeRooms()`(추천/열린 방 카드)·`useMe()`(추천 헤더)·`useNotifications()`(알림 dot) 훅으로만 데이터에 접근한다(PRD §3.3 · §3.16).
+> LocationSheet props: `visible` · `selected` · `onSelect` · `onClose`. 표시/선택 상태는 HomeScreen이 소유한다(프레젠테이션).
 
 ## 라우트 (`src/app/` — Expo Router)
 

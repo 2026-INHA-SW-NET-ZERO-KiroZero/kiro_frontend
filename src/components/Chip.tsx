@@ -62,12 +62,12 @@ const styles = StyleSheet.create({
     backgroundColor: color.white,
   },
   label: {
-    fontSize: font.size.sm,
-    fontFamily: font.family.semibold,
+    fontSize: font.size.cap,
     letterSpacing: font.tracking.base,
   },
-  labelActive: { color: color.brandStrong },
-  labelInactive: { color: color.ink4 },
+  // dc.html 필터칩: active weight 700(family.semibold), inactive weight 600(family.medium).
+  labelActive: { color: color.brandStrong, fontFamily: font.family.semibold },
+  labelInactive: { color: color.ink4, fontFamily: font.family.medium },
   toggle: {
     borderRadius: radius.lg,
     paddingVertical: space.sm,
