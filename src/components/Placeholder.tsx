@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   back: { paddingHorizontal: space.screenX, paddingVertical: space.x2 },
   backText: {
     fontSize: font.size.body,
-    fontWeight: font.weight.semibold,
+    fontFamily: font.family.semibold,
     color: color.brand,
   },
   body: {
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: font.size.h2,
-    fontWeight: font.weight.bold,
+    fontFamily: font.family.bold,
     color: color.ink,
     letterSpacing: font.tracking.tight,
   },
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   links: { marginTop: space.x6, gap: space.lg, alignItems: 'center' },
   link: {
     fontSize: font.size.bodySm,
-    fontWeight: font.weight.semibold,
+    fontFamily: font.family.semibold,
     color: color.white,
     backgroundColor: color.brand,
     paddingVertical: space.lg,

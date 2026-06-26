@@ -23,7 +23,7 @@
 - weight: `medium 600` / `semibold 700` / `bold 800`. **600 미만 사용 안 함.**
 - size: `display 33`(로그인 워드마크), `h1 25`(이름·방 제목), `h2 23`(페이지 제목), `title 18`(섹션), `body 16`(버튼·카드), `sm 14`, `cap 13`, `tiny 11`(배지).
 - **letterSpacing(tracking)은 전부 음수**(타이트). 제목/버튼은 weight 800.
-- 폰트는 `expo-font`로 로드(Pretendard 400–800). 아이콘은 Material Symbols Rounded / `@expo/vector-icons` MaterialIcons.
+- 폰트는 `expo-font`로 **weight별 family**를 로드(SemiBold 600 / Bold 700 / ExtraBold 800), 스플래시 동안 준비(`src/app/_layout.tsx`). RN은 `fontWeight`로 cut을 못 고르므로 **`fontFamily: font.family.*`로 소비**한다(`fontWeight` 사용 금지). 아이콘은 `@expo/vector-icons`(탭바 Ionicons).
 
 ## 4. 간격·라운딩·그림자
 
