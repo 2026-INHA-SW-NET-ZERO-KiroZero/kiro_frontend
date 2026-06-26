@@ -1,9 +1,9 @@
 /**
  * 홈 화면 (PRD §3.3 · dc.html 홈 line 143~241).
- * 상단 워드마크/필터 → 날짜 스트립 → 필터칩 → 추천 모임(가로) → 오늘 열린 방(세로).
+ * 상단 워드마크/알림 → 날짜 스트립 → 지역 필터칩 → 오늘 열린 방(세로).
  * 지역 필터칩 탭 시 Location 바텀시트(§3.16)를 연다.
  *
- * 데이터는 전부 훅 경유: useHomeRooms(카드), useMe(추천 헤더), useNotifications(알림 dot).
+ * 데이터는 전부 훅 경유: useHomeRooms(카드), useNotifications(알림 dot).
  */
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -14,7 +14,7 @@ import { AvatarStack } from '@/components/Avatar';
 import { Chip } from '@/components/Chip';
 import { Icon } from '@/components/Icon';
 import { StatusBadge } from '@/components/StatusBadge';
-import { useHomeRooms, useMe, useNotifications } from '@/hooks';
+import { useHomeRooms, useNotifications } from '@/hooks';
 import type { HomeRoomCard } from '@/hooks';
 import { calendarTile, color, font, radius, shadow, space } from '@/theme/theme';
 
@@ -41,8 +41,7 @@ const DAY_COLOR: Record<DayVariant, { num: string; weekday: string }> = {
 
 export function HomeScreen() {
   const router = useRouter();
-  const { recRooms, openRooms } = useHomeRooms();
-  const { data: me } = useMe();
+  const { openRooms } = useHomeRooms();
   const { data: notifs } = useNotifications();
   const hasUnread = notifs.some((n) => n.unread);
 
@@ -63,17 +62,14 @@ export function HomeScreen() {
             <Text style={styles.campusPillText}>🌱 인하대</Text>
           </View>
         </View>
-        <View style={styles.topIcons}>
-          <Icon name="search" size={25} color={color.ink} />
-          <Pressable
-            onPress={() => router.push('/notifications')}
-            hitSlop={8}
-            style={styles.notifBtn}
-          >
-            <Icon name="notifications" size={25} color={color.ink} />
-            {hasUnread ? <View style={styles.notifDot} /> : null}
-          </Pressable>
-        </View>
+        <Pressable
+          onPress={() => router.push('/notifications')}
+          hitSlop={8}
+          style={styles.notifBtn}
+        >
+          <Icon name="notifications" size={25} color={color.ink} />
+          {hasUnread ? <View style={styles.notifDot} /> : null}
+        </Pressable>
       </View>
 
       <ScrollView
@@ -106,25 +102,6 @@ export function HomeScreen() {
           contentContainerStyle={styles.filterRow}
         >
           <Chip label="📍 인하대 ▾" active onPress={() => setLocationOpen(true)} />
-          <Chip label="마감 가리기" active />
-          <Chip label="🌙 저녁 모임" />
-          <Chip label="조리실습실" />
-          <Chip label="공유주방" />
-        </ScrollView>
-
-        {/* 추천 모임 */}
-        <View style={styles.sectionHeader}>
-          <Icon name="recommend" size={20} color={color.brand} />
-          <Text style={styles.sectionTitle}>{me.name} 님 추천 모임</Text>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.recRow}
-        >
-          {recRooms.map((room) => (
-            <RecCard key={room.id} room={room} onPress={() => goRoom(room.id)} />
-          ))}
         </ScrollView>
 
         {/* 오늘 열린 방 */}
@@ -148,27 +125,6 @@ export function HomeScreen() {
         onClose={() => setLocationOpen(false)}
       />
     </SafeAreaView>
-  );
-}
-
-/** 추천 모임 카드 (가로 스크롤, width 176). */
-function RecCard({ room, onPress }: { room: HomeRoomCard; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={styles.recCard}>
-      <View style={styles.recTopRow}>
-        <Text style={styles.recTime}>{room.time}</Text>
-        <StatusBadge status={room.badgeKey} label={room.badgeLabel} size="sm" />
-      </View>
-      <Text style={styles.recTitle} numberOfLines={2}>
-        {room.title}
-      </Text>
-      <View style={styles.placeRow}>
-        <Icon name="location-on" size={15} color={color.textMute} />
-        <Text style={styles.recPlace} numberOfLines={1}>
-          {room.place}
-        </Text>
-      </View>
-    </Pressable>
   );
 }
 
@@ -237,11 +193,6 @@ const styles = StyleSheet.create({
     color: color.ecoText,
     letterSpacing: font.tracking.base,
   },
-  topIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.x5,
-  },
   notifBtn: {
     position: 'relative',
   },
@@ -297,13 +248,6 @@ const styles = StyleSheet.create({
     paddingBottom: space.x6,
   },
   // ---- 섹션 헤더 ----
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-    paddingHorizontal: space.screenX,
-    paddingBottom: space.xs,
-  },
   sectionTitle: {
     fontSize: font.size.lg,
     fontFamily: font.family.bold,
@@ -314,49 +258,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.screenX,
     paddingTop: space.x4,
     paddingBottom: space.xs,
-  },
-  // ---- 추천 카드 ----
-  recRow: {
-    gap: space.xl,
-    paddingHorizontal: space.screenX,
-    paddingTop: space.x2,
-    paddingBottom: space.sm,
-  },
-  recCard: {
-    width: 176,
-    backgroundColor: color.white,
-    borderWidth: 1,
-    borderColor: color.border,
-    borderRadius: radius.card2,
-    padding: space.x4,
-    gap: space.sm,
-    ...shadow.card,
-  },
-  recTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-  },
-  recTime: {
-    fontSize: font.size.title,
-    fontFamily: font.family.bold,
-    color: color.ink,
-    letterSpacing: font.tracking.tight,
-  },
-  recTitle: {
-    fontSize: font.size.smx,
-    fontFamily: font.family.semibold,
-    color: color.ink,
-    lineHeight: 18.5,
-    height: 37,
-    letterSpacing: font.tracking.snug,
-  },
-  recPlace: {
-    flex: 1,
-    fontSize: font.size.micro,
-    fontFamily: font.family.medium,
-    color: color.textMute,
-    letterSpacing: font.tracking.snug,
   },
   // ---- 열린 방 카드 ----
   openList: {
