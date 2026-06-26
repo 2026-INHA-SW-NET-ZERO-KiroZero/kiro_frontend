@@ -6,8 +6,8 @@
 **백엔드 Swagger**: https://umc-lxd.shop/swagger-ui/index.html (OpenAPI JSON: https://umc-lxd.shop/v3/api-docs)
 **서버 주소**: https://umc-lxd.shop/ (앱은 `.env.local`의 `EXPO_PUBLIC_API_BASE_URL`로 주입)
 **스냅샷**: `docs/references/backend-swagger.json` — `KiroZero Backend API` v1.0.0 ("냉장고 반상회 MVP 백엔드 API 문서")
-**스냅샷 확인일**: 2026-06-27 — 엔드포인트 **22개** 정의됨(이전 "paths 비어 있음" 상태에서 채워짐).
-**소스 대조일**: 2026-06-27 — 백엔드 컨트롤러·DTO 전수(`com.kirozero.netzero.domain.*`)와 1:1 대조해 22개 엔드포인트·모든 DTO 필드 일치 확인. 코드에서만 드러나는 enum 고정값·검증 제약·기본값을 아래에 보강.
+**스냅샷 확인일**: 2026-06-27 — 엔드포인트 **24개** 정의됨(이전 22개에서 `my-session-controller`의 `GET /me/sessions`·`GET /me/sessions/{slotId}` 2개 추가).
+**소스 대조일**: 2026-06-27 — 백엔드 컨트롤러·DTO 전수(`com.kirozero.netzero.domain.*`)와 1:1 대조해 24개 엔드포인트·모든 DTO 필드 일치 확인. 코드에서만 드러나는 enum 고정값·검증 제약·기본값을 아래에 보강.
 **경로 접두사**: 모든 엔드포인트 `/api/v1`.
 
 ## 인증
@@ -16,7 +16,7 @@
 - `POST /api/v1/auth/login`(또는 `/signup`) 응답의 `token` 값을 이후 요청 `Authorization: Bearer <token>` 헤더로 전달.
 - Swagger상 다수 엔드포인트의 `Authorization` 파라미터는 `required: false`로 노출되나, 보호 자원(`/me/*`, 참여·투표·기록·결과 등)은 실제로 토큰이 필요하다. 토큰 저장은 `src/lib/tokenStorage.ts` + `src/hooks/useAuth.ts` 참조.
 
-## 엔드포인트 (22)
+## 엔드포인트 (24)
 
 ### auth-controller
 
@@ -62,6 +62,13 @@
 | GET    | `/api/v1/sessions/{slotId}/cooking-guide` | 조리 가이드(단계별)            | path `slotId`, query `view`(기본 `all`) | `CookingGuideResponse`             |
 | GET    | `/api/v1/sessions/{slotId}/checklist`     | 준비물 체크리스트              | path `slotId` + `Authorization`         | `SessionChecklistResponse`         |
 
+### my-session-controller (내 모임 / 신청 내역)
+
+| Method | Path                            | 설명                  | 요청                            | 응답                      |
+| ------ | ------------------------------- | --------------------- | ------------------------------- | ------------------------- |
+| GET    | `/api/v1/me/sessions`           | 내 모임/신청 세션 목록 | `Authorization` 헤더            | `MySessionListResponse`   |
+| GET    | `/api/v1/me/sessions/{slotId}`  | 내 모임 세션 상세      | path `slotId` + `Authorization` | `MySessionDetailResponse` |
+
 ### recommendation-controller (AI 메뉴 추천)
 
 | Method | Path                                               | 설명                  | 요청                            | 응답                           |
@@ -79,7 +86,7 @@
 
 | Method | Path                                            | 설명                      | 요청                             | 응답                              |
 | ------ | ----------------------------------------------- | ------------------------- | -------------------------------- | --------------------------------- |
-| POST   | `/api/v1/sessions/{slotId}/consumption-records` | 사용량 기록 생성(조리 후) | `CreateConsumptionRecordRequest` | `CreateConsumptionRecordResponse` |
+| POST   | `/api/v1/sessions/{slotId}/consumption-records` | 사용량 기록 생성(조리 후) = **모임 평가 제출**(완식률·사진·재료별 사용률) | `CreateConsumptionRecordRequest` | `CreateConsumptionRecordResponse` |
 | GET    | `/api/v1/sessions/{slotId}/result`              | 세션 탄소 절감 리포트     | path `slotId` + `Authorization`  | `SessionResultResponse`           |
 | GET    | `/api/v1/me/results/total`                      | 내 누적 리포트            | `Authorization` 헤더             | `MyResultTotalResponse`           |
 
@@ -142,6 +149,14 @@ SharedIngredientPoolItemResponse { ingredientId: long, nameKo, estimatedTotalGra
 UpdateSessionIngredientsRequest  { items*: JoinIngredientRequest[] }
 UpdateSessionIngredientsResponse { slotId: long, items: SessionIngredientResponse[] }
 SessionIngredientResponse        { sessionIngredientId: long, ingredientId: long, nameKo, count, knownGrams, estimatedGrams: number }
+```
+
+### 내 모임(세션) 조회
+
+```
+MySessionListResponse   { sessions: MySessionItemResponse[] }
+MySessionItemResponse   { slotId: long, participantId: long, date, placeName, stationCode, startTime, endTime, timeLabel, capacity: int, participantCount: long, status: Status, canPurchase: boolean, myIngredientCount: long, hasRecommendation: boolean, hasSelectedMenu: boolean, completed: boolean, selectedMenu: SelectedMenuSummaryResponse }
+MySessionDetailResponse { slotId: long, myParticipantId: long, joined: boolean, canPurchase: boolean, status: Status, myIngredients: SessionIngredientResponse[], session: SessionStatusResponse, hasRecommendation: boolean, hasSelectedMenu: boolean, completed: boolean, selectedMenu: SelectedMenuSummaryResponse }
 ```
 
 ### 추천·투표

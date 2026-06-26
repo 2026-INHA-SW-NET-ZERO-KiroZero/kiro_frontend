@@ -13,7 +13,7 @@
 - 서버 주소: https://umc-lxd.shop/ (앱은 `.env.local`의 `EXPO_PUBLIC_API_BASE_URL`로 주입)
 - Swagger UI: https://umc-lxd.shop/swagger-ui/index.html
 - OpenAPI JSON: https://umc-lxd.shop/v3/api-docs
-- 상태(2026-06-27 확인): **엔드포인트 22개 정의됨**(title `KiroZero Backend API` v1.0.0). 이전 "paths 비어 있음" 상태에서 채워졌다. 스냅샷은 `docs/references/backend-swagger.json`, 추출 명세는 `docs/generated/api-schema.md`에 정리. **이제 연동 가능 — 단, 도메인별로 아래 절차(Swagger ↔ api-schema 대조 → 일치 시에만 구현)를 지킨다. 미연동 도메인은 더미데이터 유지.**
+- 상태(2026-06-27 확인): **엔드포인트 24개 정의됨**(title `KiroZero Backend API` v1.0.0). 이전 "paths 비어 있음" → 22개 → `my-session-controller`(`GET /me/sessions`·`/me/sessions/{slotId}`) 2개 추가로 24개. 스냅샷은 `docs/references/backend-swagger.json`, 추출 명세는 `docs/generated/api-schema.md`에 정리. **이제 연동 가능 — 단, 도메인별로 아래 절차(Swagger ↔ api-schema 대조 → 일치 시에만 구현)를 지킨다. 미연동 도메인은 더미데이터 유지.**
 
 ## 필수 절차 (순서 고정)
 
