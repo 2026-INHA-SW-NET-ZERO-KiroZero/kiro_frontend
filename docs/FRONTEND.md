@@ -41,6 +41,13 @@ src/
 - 탭바: 활성 `color.brand` + filled / 비활성 `color.textFaint2` + outline 아이콘(Ionicons). 색은 theme 토큰만 사용.
 - 화면은 모두 `src/components/Placeholder.tsx`(빈 SafeAreaView + 화면명)로 채워져 있고, 후속 화면 이슈에서 `features/{도메인}`의 실제 화면으로 교체된다.
 
+### 2.2 폰트·아이콘·테마 부트스트랩 (issue #3 구현)
+
+- **폰트(Pretendard).** `assets/fonts/Pretendard-{SemiBold,Bold,ExtraBold}.otf`(OFL)를 `src/app/_layout.tsx`의 `useFonts`로 로드한다. `app.json` plugins에 `expo-font`·`expo-splash-screen` 등록. 부팅 시 `SplashScreen.preventAutoHideAsync()`로 스플래시를 유지하고 폰트 준비 후 `hideAsync()`(준비 전 `return null`).
+- **weight별 family.** RN은 커스텀 폰트의 cut을 `fontWeight`로 고르지 못한다 → weight마다 별도 family를 등록하고 **`fontFamily`로 소비**한다. `theme.font.family`(`medium`=SemiBold 600 / `semibold`=Bold 700 / `bold`=ExtraBold 800)를 쓰고, `fontWeight`는 쓰지 않는다. PRD "600 미만 사용 안 함" → 3 cut만 로드.
+- **아이콘.** `@expo/vector-icons`(탭바는 Ionicons). 별도 폰트 로드 불필요.
+- **그라데이션·링.** `expo-linear-gradient`(hero/stat 카드), `react-native-svg`(도넛 진행률) 도입 — 사용 규칙은 `docs/DESIGN.md` §2·§5.
+
 ## 3. 컴포넌트 패턴 (혼합형)
 
 - **공용 컴포넌트(`src/components/`)는 프레젠테이션** — props만 받고 로직/데이터 페칭 없음.

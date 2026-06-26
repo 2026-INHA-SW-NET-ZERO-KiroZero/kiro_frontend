@@ -83,10 +83,20 @@ export const gradient = {
   creamBd: '#F6DFC9', // border that pairs with `cream`
 } as const;
 
-/** Type scale (px). RN: pass fontSize as number; weight as string. Font = Pretendard. */
+/** Type scale (px). RN: pass fontSize as number. Font = Pretendard. */
 export const font = {
-  family: 'Pretendard', // load via expo-font (Pretendard-Regular/Medium/SemiBold/Bold/ExtraBold)
-  // weights map to Pretendard cuts; RN fontWeight strings:
+  /**
+   * Pretendard family names registered with expo-font (see `src/app/_layout.tsx`).
+   * RN can't pick a custom-font cut via `fontWeight`, so each weight is a distinct
+   * family — consume with `fontFamily: font.family.bold` (NOT `fontWeight`).
+   * Keys mirror `weight` below: medium→600, semibold→700, bold→800.
+   */
+  family: {
+    medium: 'Pretendard-SemiBold', // 600
+    semibold: 'Pretendard-Bold', // 700
+    bold: 'Pretendard-ExtraBold', // 800
+  } as const,
+  // numeric weights (reference). Prefer `family.*` for actual rendering.
   weight: { medium: '600', semibold: '700', bold: '800' } as const,
   size: {
     display: 33, // login wordmark
