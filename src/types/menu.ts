@@ -16,8 +16,10 @@ export interface Purchase {
 /** AI 추천 메뉴 후보 (recommend 화면). */
 export interface MenuCandidate {
   name: string;
-  emoji: string;
-  score: number;
+  /** API 미제공 — optional. */
+  emoji?: string;
+  /** API 미제공 — optional. 화면은 rank 인덱스로 표시. */
+  score?: number;
   time: string;
   /** 난이도 (예: '쉬움' | '아주 쉬움' | '보통'). */
   diff: string;
@@ -27,20 +29,26 @@ export interface MenuCandidate {
   missing: IngredientNeed[];
   /** 저탄소 메뉴 여부. */
   type: '저탄소' | '일반';
-  /** 탄소 배출량 표기 (예: '0.8kg CO₂'). */
-  co2: string;
+  /** API 미제공 — optional. */
+  co2?: string;
+  /** API candidateLabel (투표 제출 시 사용). */
+  candidateLabel?: string;
 }
 
 /** 투표 후보 메뉴 (myApplication 투표 단계). E(재추천)는 인덱스 4의 합성 옵션. */
 export interface VoteMenu {
   key: string;
   name: string;
-  emoji: string;
+  /** API 미제공 — optional. */
+  emoji?: string;
   type: '저탄소' | '일반';
   desc: string;
   votes: number;
-  co2: string;
+  /** API 미제공 — optional. */
+  co2?: string;
   purchase: Purchase | null;
+  /** API candidateLabel (투표 제출 시 사용). */
+  candidateLabel?: string;
 }
 
 /** 역할 분배 & 준비물 (확정 메뉴의 인별 카드). */

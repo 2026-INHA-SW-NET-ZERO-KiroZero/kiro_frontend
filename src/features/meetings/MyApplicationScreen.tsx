@@ -41,10 +41,11 @@ function skillStyle(skill: string): { fg: string; bg: string } {
 export function MyApplicationScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const slotId = Number(id ?? '0');
   const { data: application } = useMyApplication(id ?? 'app1');
-  const { data: partyPool } = usePartyPool();
-  const { data: voteMenus } = useVoteMenus();
-  const { data: decided } = useDecidedMenu();
+  const { data: partyPool } = usePartyPool(slotId);
+  const { data: voteMenus } = useVoteMenus(slotId);
+  const { data: decided } = useDecidedMenu(slotId);
 
   const [myVote, setMyVote] = useState<number | null>(null);
   const [votingDone, setVotingDone] = useState(false);
@@ -488,6 +489,7 @@ function VoteCard({
 /* ------------------------------ result ------------------------------ */
 
 function ResultStage({ decided }: { decided: ReturnType<typeof useDecidedMenu>['data'] }) {
+  if (decided === null) return null;
   return (
     <>
       <View style={styles.resultHeader}>

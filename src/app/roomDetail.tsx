@@ -36,11 +36,11 @@ export default function RoomDetailScreen() {
   const [showJoinSheet, setShowJoinSheet] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(null);
 
-  const { data: room } = useRoomDetail(id ?? '');
-  const { data: partyPool } = usePartyPool();
-  const { data: aggList } = useAggIngredients();
-
   const slotId = Number(id);
+
+  const { data: room } = useRoomDetail(id ?? '');
+  const { data: partyPool } = usePartyPool(slotId);
+  const { data: aggList } = useAggIngredients();
   // 로컬 override가 없으면 API 응답 joined 값을 사용
   const joined = joinedOverride ?? room?.joined ?? false;
 
@@ -80,7 +80,7 @@ export default function RoomDetailScreen() {
           .catch(() => {});
         break;
       case 'recommend':
-        router.push('/recommend');
+        router.push(`/recommend?slotId=${slotId}`);
         break;
       case 'usage':
         router.push('/usage');

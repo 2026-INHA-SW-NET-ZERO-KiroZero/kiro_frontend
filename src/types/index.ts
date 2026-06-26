@@ -38,3 +38,19 @@ export type { SettleItem, Debtor, Settlement } from './settlement';
 export type { PastMenu, SeedEval, PastPart, PastMeeting } from './meeting';
 export type { MonthlyResultSummaryResponse, MyResultTotalResponse } from './result';
 export type { DataResult } from './query';
+export type {
+  SessionStatus,
+  VoteType,
+  SessionIngredientStatusResponse,
+  SessionParticipantStatusResponse,
+  SharedIngredientPoolItemResponse,
+  SessionStatusResponse,
+  UpdateSessionIngredientsRequest,
+  UpdateSessionIngredientsResponse,
+  MenuCandidateResponse,
+  RecommendationResponse,
+  LatestRecommendationResponse,
+  SelectedMenuSummaryResponse,
+  MenuVoteRequest,
+  MenuVoteResponse,
+} from './session';
