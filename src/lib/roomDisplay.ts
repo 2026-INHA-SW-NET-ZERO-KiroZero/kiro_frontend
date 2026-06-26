@@ -51,10 +51,10 @@ function resolveBadge(state: RoomState, seatsLeft: number, canceled: boolean): S
   if (canceled) return 'canceled';
   if (state === 'COOKED') return 'cooked';
   if (state === 'CONFIRMED') return 'confirmed';
-  // OPEN
+  // OPEN — 디자인 원본(KiroZero.dc.html)엔 '모집중' 배지가 없고 'N자리 남음'(seatsLeft)만 존재.
   if (seatsLeft <= 0) return 'full';
   if (seatsLeft <= 1) return 'almostFull';
-  return 'open';
+  return 'seatsLeft';
 }
 
 /** CTA 결정 (PRD §3.4 "CTA logic (critical)"). */

@@ -1,12 +1,12 @@
 import { roomDisplay } from './roomDisplay';
 
 describe('roomDisplay — OPEN', () => {
-  it('여유 있으면 모집중 + 참여 CTA', () => {
+  it('여유 있으면 N자리 남음 + 참여 CTA', () => {
     const d = roomDisplay({ state: 'OPEN', capacity: 4, count: 2 });
     expect(d.seatsLeft).toBe(2);
     expect(d.seatsCount).toBe('2/4명');
     expect(d.seatsText).toBe('2자리 남음');
-    expect(d.badge).toBe('open');
+    expect(d.badge).toBe('seatsLeft');
     expect(d.cta).toEqual({
       label: '이 모임 참여하기',
       action: 'join',
