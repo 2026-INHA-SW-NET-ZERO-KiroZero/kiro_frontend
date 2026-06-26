@@ -7,6 +7,7 @@ export type {
   LoginRequest,
   AuthResponse,
   CurrentUserResponse,
+  UpdateProfileRequest,
   AllergyTagItemResponse,
   AllergyTagListResponse,
 } from './auth';
@@ -25,5 +26,5 @@ export type { NotifType, NotifTone, Notif } from './notification';
 export type { MyApplication } from './application';
 export type { SettleItem, Debtor, Settlement } from './settlement';
 export type { PastMenu, SeedEval, PastPart, PastMeeting } from './meeting';
-export type { ReportMonth } from './report';
+export type { MonthlyResultSummaryResponse, MyResultTotalResponse } from './result';
 export type { DataResult } from './query';

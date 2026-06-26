@@ -1,9 +1,16 @@
-/** 알레르기 토글 칩 옵션 데이터 훅. (API 교체 지점: 알레르기 마스터 목록) */
-import { allergyAll } from '@/data';
-import type { AllergyOption, DataResult } from '@/types';
+/** 알레르기 토글 칩 옵션 데이터 훅. (`GET /api/v1/allergy-tags` → `AllergyTagListResponse`) */
+import { useCallback } from 'react';
 
-import { useSeedList } from './useSeed';
+import { apiRequest } from '@/lib/apiClient';
+import type { AllergyOption, AllergyTagListResponse } from '@/types';
 
-export function useAllergyOptions(): DataResult<AllergyOption[]> {
-  return useSeedList(allergyAll);
+import { useApiData } from './useApiData';
+import type { AsyncResult } from './useApiData';
+
+export function useAllergyOptions(): AsyncResult<AllergyOption[]> {
+  const fetcher = useCallback(async (): Promise<AllergyOption[]> => {
+    const res = await apiRequest<AllergyTagListResponse>('/allergy-tags');
+    return res.allergyTags.map((t) => ({ tag: t.tag, label: t.labelKo }));
+  }, []);
+  return useApiData<AllergyOption[]>(fetcher, { initial: [], isEmpty: (d) => d.length === 0 });
 }

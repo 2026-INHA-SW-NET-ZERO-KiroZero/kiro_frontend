@@ -36,6 +36,8 @@ export interface AuthResponse {
   email: string;
   nickname: string;
   cookingSkill: CookingSkill;
+  /** 누적 환불 적립금(원). */
+  cash: number;
   allergyTags: string[];
   token: string;
 }
@@ -43,6 +45,15 @@ export interface AuthResponse {
 export interface CurrentUserResponse {
   userId: number;
   email: string;
+  nickname: string;
+  cookingSkill: CookingSkill;
+  /** 누적 환불 적립금(원). 프론트에서는 "나뭇잎"으로 표기. */
+  cash: number;
+  allergyTags: string[];
+}
+
+/** 프로필 수정 요청 (`PUT /api/v1/me/profile`). */
+export interface UpdateProfileRequest {
   nickname: string;
   cookingSkill: CookingSkill;
   allergyTags: string[];

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
@@ -10,18 +10,26 @@ import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
 /** MY 화면 (PRD §3.13). 프로필 요약 + 절감/숙련도/알레르기 + 활동 진입. */
 export default function MyScreen() {
-  const { data: me } = useMe();
+  const { data: me, loading: meLoading } = useMe();
   const { currentSaved } = useReport();
   const { skillLevel, allergies } = useProfile();
   const { data: allergyOptions } = useAllergyOptions();
   const { logout } = useAuth();
 
-  const allergyChips = allergyOptions.filter((a) => allergies.includes(a.label));
+  const allergyChips = allergyOptions.filter((a) => allergies.includes(a.tag));
 
   const onLogout = async () => {
     await logout();
     router.replace('/(auth)/login');
   };
+
+  if (meLoading || me === null) {
+    return (
+      <SafeAreaView style={[styles.safe, styles.center]} edges={['top']}>
+        <ActivityIndicator color={color.brand} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -89,10 +97,8 @@ export default function MyScreen() {
           {allergyChips.length > 0 ? (
             <View style={styles.allergyChips}>
               {allergyChips.map((a) => (
-                <View key={a.label} style={styles.allergyChip}>
-                  <Text style={styles.allergyChipText}>
-                    {a.emoji} {a.label}
-                  </Text>
+                <View key={a.tag} style={styles.allergyChip}>
+                  <Text style={styles.allergyChipText}>{a.label}</Text>
                 </View>
               ))}
             </View>
@@ -130,6 +136,7 @@ export default function MyScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: color.appBg },
+  center: { alignItems: 'center', justifyContent: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -8,6 +8,7 @@
 **스냅샷**: `docs/references/backend-swagger.json` — `KiroZero Backend API` v1.0.0 ("냉장고 반상회 MVP 백엔드 API 문서")
 **스냅샷 확인일**: 2026-06-27 — 엔드포인트 **24개** 정의됨(이전 22개에서 `my-session-controller`의 `GET /me/sessions`·`GET /me/sessions/{slotId}` 2개 추가).
 **소스 대조일**: 2026-06-27 — 백엔드 컨트롤러·DTO 전수(`com.kirozero.netzero.domain.*`)와 1:1 대조해 24개 엔드포인트·모든 DTO 필드 일치 확인. 코드에서만 드러나는 enum 고정값·검증 제약·기본값을 아래에 보강.
+**최근 갱신(2026-06-27, 백엔드 `f4e4fce` 기준)**: 엔드포인트 수·경로는 동일(24개). DTO 필드만 확장됨 — ① `CurrentUserResponse`·`AuthResponse`에 `cash`(int, 누적 환불 적립금) 추가, ② `MyResultTotalResponse`가 월별 추이·참여/재료 stat·전월 대비·인사이트 문구·`monthlyResults`까지 포함하도록 대폭 확장, ③ 신규 `MonthlyResultSummaryResponse`(월별 요약) 추가. 스냅샷(`backend-swagger.json`)·라이브와 일치 확인.
 **경로 접두사**: 모든 엔드포인트 `/api/v1`.
 
 ## 인증
@@ -112,8 +113,9 @@
 ```
 SignupRequest        { email*: string<email>, password*: string(min 8), nickname*: string, cookingSkill*: CookingSkill, allergyTags: string[] }
 LoginRequest         { email*: string<email>, password*: string }
-AuthResponse         { userId: long, email, nickname, cookingSkill: CookingSkill, allergyTags: string[], token: string }
-CurrentUserResponse  { userId: long, email, nickname, cookingSkill: CookingSkill, allergyTags: string[] }
+AuthResponse         { userId: long, email, nickname, cookingSkill: CookingSkill, cash: int, allergyTags: string[], token: string }
+CurrentUserResponse  { userId: long, email, nickname, cookingSkill: CookingSkill, cash: int, allergyTags: string[] }
+# cash = 누적 환불 적립금(원). 가입 시 0, 사용량 기록(모임 평가) 제출 시 refundAmountPerUser만큼 증가. ⚠️ 프론트 `me.leaves`(나뭇잎)·월별 추이와는 다른 개념 — 백엔드에 "나뭇잎" 필드는 없음.
 UpdateProfileRequest { nickname*: string, cookingSkill*: CookingSkill, allergyTags: string[] }
 AllergyTagListResponse { allergyTags: AllergyTagItemResponse[] }
 AllergyTagItemResponse { tag, labelKo, description }
@@ -132,8 +134,8 @@ JoinIngredientRequest    { ingredientId*: long, count*: number(≥0.01), knownGr
 ```
 SlotListResponse     { slots: SlotListItemResponse[] }
 SlotListItemResponse { slotId: long, date, placeName, stationCode, startTime, endTime, capacity: int, participantCount: int, status: string, commonKitSummary: string[] }
-SlotDetailResponse   { slotId: long, date<date>, placeName, stationCode, startTime, endTime, capacity: int, participantCount: long, status: Status, commonKit: string[], participants: SlotDetailParticipantResponse[] }
-SlotDetailParticipantResponse { participantId: long, nickname, cookingSkill: CookingSkill, canPurchase: boolean, ingredientCount: int }
+SlotDetailResponse   { slotId: long, date<date>, placeName, stationCode, startTime, endTime, capacity: int, participantCount: long, status: Status, commonKit: string[], joined: boolean, myParticipantId: long, participants: SlotDetailParticipantResponse[] }
+SlotDetailParticipantResponse { participantId: long, nickname, cookingSkill: CookingSkill, allergyTags: string[], canPurchase: boolean, ingredientCount: int }
 JoinSlotRequest      { canPurchase: boolean, ingredients*: JoinIngredientRequest[] }
 JoinSlotResponse     { slotId: long, participantId: long, status: Status, canPurchase: boolean, ingredients: SessionIngredientResponse[] }
 LeaveSlotResponse    { slotId: long, status: Status, left: boolean }
@@ -143,7 +145,7 @@ LeaveSlotResponse    { slotId: long, status: Status, left: boolean }
 
 ```
 SessionStatusResponse { slotId: long, status: Status, participants: SessionParticipantStatusResponse[], sharedIngredientPool: SharedIngredientPoolItemResponse[], canRequestRecommendation: boolean }
-SessionParticipantStatusResponse { participantId: long, nickname, cookingSkill: CookingSkill, canPurchase: boolean, ingredients: SessionIngredientStatusResponse[] }
+SessionParticipantStatusResponse { participantId: long, nickname, cookingSkill: CookingSkill, allergyTags: string[], canPurchase: boolean, ingredients: SessionIngredientStatusResponse[] }
 SessionIngredientStatusResponse  { sessionIngredientId: long, ingredientId: long, nameKo, count, knownGrams, estimatedGrams: number }
 SharedIngredientPoolItemResponse { ingredientId: long, nameKo, estimatedTotalGrams: number }
 UpdateSessionIngredientsRequest  { items*: JoinIngredientRequest[] }
@@ -191,7 +193,9 @@ ConsumptionRecordItemRequest    { sessionIngredientId*: long, useRate*: int }
 CreateConsumptionRecordResponse { recordId: long, slotId: long, refundScore: int, refundAmountPerUser: int, totalUsedGrams: number, estimatedCarbonSavedKgco2e: number, campusReportLogged: boolean, nextStatus: Status }
 SessionResultResponse  { slotId: long, menuName, menuType, totalUsedGrams, avgIngredientUseRate: int, finishedFoodRate: int, estimatedFoodWasteReducedGrams: number, estimatedCarbonSavedKgco2e: number, lowCarbonSelected: boolean, refundScore: int, refundAmountPerUser: int, totalRefundAmount: int, summaryText, photoUrls: PhotoUrlsResponse }
 PhotoUrlsResponse      { cookedPhotoUrl, afterPhotoUrl }
-MyResultTotalResponse  { completedSessionCount: int, totalUsedGrams: number, totalEstimatedCarbonSavedKgco2e: number, totalRefundAmount: int }
+MyResultTotalResponse  { completedSessionCount: int, totalUsedGrams: number, totalEstimatedCarbonSavedKgco2e: number, totalRefundAmount: int, togetherPeopleCount: int, providedIngredientCount: int, usedIngredientCount: int, averageIngredientUseRate: int, currentMonthEstimatedCarbonSavedKgco2e: number, previousMonthEstimatedCarbonSavedKgco2e: number, monthOverMonthCarbonDeltaKgco2e: number, insightMessage: string, monthlyResults: MonthlyResultSummaryResponse[] }
+MonthlyResultSummaryResponse { yearMonth: string("yyyy-MM"), monthLabel: string("M월"), completedSessionCount: int, totalUsedGrams: number, totalEstimatedCarbonSavedKgco2e: number, totalRefundAmount: int, togetherPeopleCount: int, providedIngredientCount: int, usedIngredientCount: int, averageIngredientUseRate: int }
+# MyResultTotalResponse 필드 의미(ConsumptionResultService): completedSessionCount=완료(기록 제출) 세션 수, totalRefundAmount=누적 환불액(원) 합, togetherPeopleCount=참여 세션들의 참가자 수 합, providedIngredientCount=제출된 기록 아이템 총 수, usedIngredientCount=useRate>0인 아이템 수, averageIngredientUseRate=세션 avgIngredientUseRate들의 평균(%), monthlyResults=월별 내림차순(현재월이 [0]), currentMonth/previousMonth=monthlyResults[0]·그 전월의 탄소 합, monthOverMonthCarbonDelta=현재월−전월, insightMessage="약 {탄소}kg의 탄소 배출을 줄인 셈이에요. 작은 한 끼가 모여 캠퍼스를 바꿔요."(리포트 eco 카피와 동일). 기록 없으면 전부 0/빈배열.
 ```
 
 ### 업로드·데모

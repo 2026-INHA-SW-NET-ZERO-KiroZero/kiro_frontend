@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
@@ -10,10 +10,15 @@ import type { SkillLevel } from '@/types';
 
 const SKILLS: SkillLevel[] = ['상', '중', '하'];
 
-/** 프로필 수정 화면 (PRD §3.14). 요리 숙련도 + 알레르기 토글. 즉시 반영, 저장은 복귀. */
+/** 프로필 수정 화면 (PRD §3.14). 요리 숙련도 + 알레르기 토글. 즉시 반영, 저장 시 PUT 후 복귀. */
 export default function EditProfileScreen() {
-  const { skillLevel, allergies, setSkill, toggleAllergy } = useProfile();
-  const { data: allergyOptions } = useAllergyOptions();
+  const { skillLevel, allergies, setSkill, toggleAllergy, save, saving } = useProfile();
+  const { data: allergyOptions, loading: optionsLoading } = useAllergyOptions();
+
+  const onSave = async () => {
+    await save();
+    router.back();
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -56,32 +61,40 @@ export default function EditProfileScreen() {
           <Text style={styles.allergyHint}>해당하는 항목을 모두 선택</Text>
         </View>
         <View style={styles.allergyGrid}>
-          {allergyOptions.map((a) => {
-            const selected = allergies.includes(a.label);
-            return (
-              <Pressable
-                key={a.label}
-                onPress={() => toggleAllergy(a.label)}
-                style={[styles.toggleChip, selected ? styles.toggleChipOn : styles.toggleChipOff]}
-              >
-                <Text
-                  style={[
-                    styles.toggleChipText,
-                    selected ? styles.toggleChipTextOn : styles.toggleChipTextOff,
-                  ]}
+          {optionsLoading ? (
+            <ActivityIndicator color={color.brand} style={styles.optionsLoading} />
+          ) : (
+            allergyOptions.map((a) => {
+              const selected = allergies.includes(a.tag);
+              return (
+                <Pressable
+                  key={a.tag}
+                  onPress={() => toggleAllergy(a.tag)}
+                  style={[styles.toggleChip, selected ? styles.toggleChipOn : styles.toggleChipOff]}
                 >
-                  {a.emoji} {a.label}
-                </Text>
-              </Pressable>
-            );
-          })}
+                  <Text
+                    style={[
+                      styles.toggleChipText,
+                      selected ? styles.toggleChipTextOn : styles.toggleChipTextOff,
+                    ]}
+                  >
+                    {a.label}
+                  </Text>
+                </Pressable>
+              );
+            })
+          )}
         </View>
       </ScrollView>
 
       {/* Sticky 저장 */}
       <LinearGradient colors={[color.appBgFade, color.appBg]} style={styles.saveBar}>
-        <Pressable onPress={() => router.back()} style={styles.saveBtn}>
-          <Text style={styles.saveBtnText}>저장하기</Text>
+        <Pressable onPress={onSave} disabled={saving} style={styles.saveBtn}>
+          {saving ? (
+            <ActivityIndicator color={color.white} />
+          ) : (
+            <Text style={styles.saveBtnText}>저장하기</Text>
+          )}
         </Pressable>
       </LinearGradient>
     </SafeAreaView>
@@ -152,6 +165,7 @@ const styles = StyleSheet.create({
     letterSpacing: font.tracking.snug,
   },
   allergyGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md },
+  optionsLoading: { alignSelf: 'flex-start', marginTop: space.md },
   toggleChip: {
     borderWidth: 1.5,
     paddingVertical: space.lg,
