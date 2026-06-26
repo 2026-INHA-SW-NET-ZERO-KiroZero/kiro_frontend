@@ -21,9 +21,7 @@ src/
 │   ├── room/       (roomDetail, recommend, usage, settlement, join sheet)
 │   ├── meetings/   (meetings, myApplication, pastApplication, pastEval)
 │   ├── report/     (report)
-│   ├── my/         (my, editProfile)
-│   ├── fridge/     (fridge, add sheet — 선택 화면)
-│   └── admin/      (admin, adminCreate)
+│   └── my/         (my, editProfile)
 ├── components/     ← 도메인 무관 공용 컴포넌트 (Button, Chip, Card, StatusBadge, Avatar, Segmented, SheetBase ...)
 ├── stores/         ← Zustand 도메인 스토어 (authStore, roomStore, evalStore, notifStore ...)
 ├── hooks/          ← 도메인 무관 공용 훅
@@ -71,7 +69,7 @@ src/
 - 리포트 co2 = `saved * 2.5` (kg)
 - 이메일 도메인 = `/@(inha\.ac\.kr|inha\.edu)$/i`
 - 돈 표기 = `value.toLocaleString('ko-KR') + '원'`
-- 방 상태 → 배지/좌석/CTA 분기(§3.5)는 한 함수(`roomDisplay`)로 통일.
+- 방 상태 → 배지/좌석/CTA 분기(§3.4)는 한 함수(`roomDisplay`)로 통일.
 
 ## 8. 금지 패턴
 

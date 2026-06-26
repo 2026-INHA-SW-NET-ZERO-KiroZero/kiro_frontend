@@ -7,7 +7,7 @@
 
 - **브랜드(빨강):** `brand #FF443D`(주요 액션·활성 탭·FAB·선택), `brandPress #E12E27`, `brandAlt #E5484D`(경고/마감).
 - **에코(초록):** `eco #2F9E8B`, `ecoText #1F8676`(라벨·환급 숫자), `ecoSlab #1E8C78`(탄소 결과 카드), `ecoBright #36BA9A`(유효 이메일).
-- **액센트:** `purple #7C6FF0`("나" 마커), `indigo #5B5BD6`(관리자 테마), `gold #C0801E`(중급·구매·앰버), `blue #3B7DE0`(토요일/캘린더).
+- **액센트:** `purple #7C6FF0`("나" 마커), `gold #C0801E`(중급·구매·앰버), `blue #3B7DE0`(토요일/캘린더).
 - **텍스트:** `ink #1E1A17`(주), `textMute #8C837B`(보조), `textFaint #A89F95`(라벨), `placeholder #CABFB4`.
 - **표면:** `appBg #FBF7F3`(화면 배경), `white`(카드), `sectionGap #EFE7DE`(8px 구분 슬랩).
 - **테두리:** `border #F1EAE2`(카드), `borderInput #ECE5DD`(입력).
@@ -15,7 +15,7 @@
 
 ## 2. 그라데이션 (`gradient`) — `expo-linear-gradient`로만
 
-- `brand`(정산 hero), `brandWarm`(MY/리포트 hero), `admin`(관리자 KPI), `cream`(확정 메뉴 카드), `warmChip`(냉장고 임박 배너).
+- `brand`(정산 hero), `brandWarm`(MY/리포트 hero), `cream`(확정 메뉴 카드).
 - **장식용 배경 그라데이션 금지.** hero/stat 카드에만 사용(PRD §1 "No AI-slop").
 
 ## 3. 타이포 (`font`) — Pretendard

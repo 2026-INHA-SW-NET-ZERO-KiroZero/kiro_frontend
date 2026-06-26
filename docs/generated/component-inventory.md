@@ -7,4 +7,4 @@
 | -------- | --------- | ------------------- | -------- | -------- |
 | App      | `App.tsx` | 엔트리(placeholder) | 0        | index.ts |
 
-> PRD 기준 예정 인벤토리: 18 화면 + 4 오버레이 + 공용 컴포넌트(Button·Chip·Card·StatusBadge·Avatar·Segmented·SheetBase 등). 화면 구현 진행 시 자동 채워진다.
+> PRD 기준 예정 인벤토리: 15 화면 + 3 오버레이 + 공용 컴포넌트(Button·Chip·Card·StatusBadge·Avatar·Segmented·SheetBase 등). 화면 구현 진행 시 자동 채워진다.

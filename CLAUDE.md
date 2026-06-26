@@ -30,11 +30,12 @@
 
 - API 연동은 **백엔드 Swagger를 먼저 확인** → `docs/generated/api-schema.md`와 대조 → **일치할 때만** 구현. 불일치를 추측으로 메우지 않는다(`docs/API-INTEGRATION.md`). 백엔드 미완성 단계에서는 더미데이터 유지.
 
-## .claude/ 구조
+## .claude/ · .githooks/ 구조
 
 - **agents/** — `kiro-ui`(화면), `kiro-logic`(상태·데이터), `kiro-qa`(검증, 별도 세션·재시도 2회 제한).
-- **skills/** (자동 트리거) — `kiro-build`(팀 구현 오케스트레이터), `github-issue-work`, `github-issue-create`, `harness-feedback`.
+- **skills/** (자동 트리거) — `kiro-build`(팀 구현 오케스트레이터), `github-issue-work`, `github-issue-create`, `harness-feedback`, `pre-push-check`(push 직전 docs 동기화 점검).
 - **commands/** (수동 `/명령`) — `/review`, `/gc`, `/health`, `/quality`.
+- **`.githooks/`** — `pre-push`: push 직전 `npm run harness`(lint+typecheck+format, 테스트 제외)를 돌려 실패 시 차단하고, 통과 후 `pre-push-check` 스킬로 docs 동기화 점검을 안내한다. 활성화는 레포당 1회 `git config core.hooksPath .githooks`.
 
 ## GitHub 이슈 워크플로우
 
