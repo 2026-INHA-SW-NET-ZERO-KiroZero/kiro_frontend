@@ -6,7 +6,7 @@
 ## 1. 기술 스택 (확정)
 
 - Expo SDK 56 · React Native 0.85 · React 19 · TypeScript strict.
-- 네비게이션: **Expo Router**(파일 기반). 상태: **Zustand**(도메인별) + 화면-로컬 `useState`.
+- 네비게이션: **Expo Router**(파일 기반). 상태: **expo-secure-store**(인증 토큰) + 화면-로컬 `useState`.
 - 스타일: `src/theme/theme.ts` 토큰 + `StyleSheet.create`. 폼: `useState` 직접 관리.
 - 라이트 모드 전용(다크모드 미지원).
 
@@ -23,7 +23,7 @@ src/
 │   ├── report/     (report)
 │   └── my/         (my, editProfile)
 ├── components/     ← 도메인 무관 공용 컴포넌트 (Button, Chip, Card, StatusBadge, Avatar, Segmented, SheetBase ...)
-├── stores/         ← Zustand 도메인 스토어 (authStore, roomStore, evalStore, notifStore ...)
+├── context/        ← (예약) 추후 전역 Context가 필요할 때
 ├── hooks/          ← 도메인 무관 공용 훅
 ├── data/           ← 더미데이터 시드 (PRD §5). 백엔드 붙으면 삭제, 타입은 유지.
 ├── lib/            ← 순수 유틸·파생 계산 (validators, format, derive, emojiGuess ...)
@@ -37,7 +37,7 @@ src/
 
 - 엔트리포인트는 `expo-router/entry`(`package.json` main). `app.json`: `plugins: ["expo-router"]`, `scheme: "kirozero"`, `experiments.typedRoutes: true`. babel은 `babel-preset-expo`.
 - 라우트 루트는 `src/app/`. 구조: `(auth)/login·signup`(탭바·백스택 없음) · `(tabs)/home·meetings·report·my`(4탭) · 나머지는 root stack에 push되며 탭바를 가린다(roomDetail·recommend·usage·settlement·myApplication·pastApplication·pastEval·editProfile·notifications).
-- 부팅 진입: `index.tsx` → `(auth)/login` 리다이렉트. 로그인 성공 → `(tabs)/home`(현재는 골격 버튼, 인증 스토어는 후속 이슈).
+- 부팅 진입: `index.tsx` → `useAuth().authed` 판단 → authed이면 `(tabs)/home`, 아니면 `(auth)/login`. 토큰은 `expo-secure-store`에 저장(`src/lib/tokenStorage.ts`), 인증 상태는 `AuthContext`(`src/hooks/useAuth.ts`)로 공유.
 - 탭바: 활성 `color.brand` + filled / 비활성 `color.textFaint2` + outline 아이콘(Ionicons). 색은 theme 토큰만 사용.
 - 화면은 모두 `src/components/Placeholder.tsx`(빈 SafeAreaView + 화면명)로 채워져 있고, 후속 화면 이슈에서 `features/{도메인}`의 실제 화면으로 교체된다.
 
@@ -62,14 +62,16 @@ src/
 
 ## 5. 상태 관리
 
-| 종류            | 도구                                      | 예                                            |
-| --------------- | ----------------------------------------- | --------------------------------------------- |
-| UI 상태         | `useState`                                | 모달 열림, 탭 선택, 포커스                    |
-| 전역(내비 생존) | Zustand 도메인 스토어                     | authed, me, allergies, notifRead, reportMonth |
-| 폼              | `useState` (PRD §4.2 shape)               | authEmail, joinIngredients, evalFood          |
-| 서버 상태       | (현재 없음) 더미 훅 → 추후 TanStack Query | useRooms()                                    |
+| 종류      | 도구                                     | 예                                   |
+| --------- | ---------------------------------------- | ------------------------------------ |
+| 인증 토큰 | `expo-secure-store` + `AuthContext`      | accessToken 저장, authed 판단        |
+| UI 상태   | `useState`                               | 모달 열림, 탭 선택, 포커스           |
+| 폼        | `useState` (PRD §4.2 shape)              | authEmail, joinIngredients, evalFood |
+| 서버 상태 | API on demand fetch (더미 훅 → API 교체) | useRooms(), useMe()                  |
 
-- 스토어는 도메인별 분리(슬라이스 X). 액션은 스토어 안에 정의. 셀렉터로 필요한 값만 구독.
+- 토큰은 `src/lib/tokenStorage.ts`(SecureStore 래퍼)로만 접근. 화면에서 직접 SecureStore 호출 금지.
+- `useAuth()` 훅으로 `authed`, `login(token)`, `logout()` 소비.
+- Zustand는 도입하지 않음. 추후 복잡한 전역 상태가 필요할 때 검토.
 
 ## 6. 데이터 페칭 / 더미데이터
 

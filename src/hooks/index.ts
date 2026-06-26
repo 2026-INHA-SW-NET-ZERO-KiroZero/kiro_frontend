@@ -13,3 +13,4 @@ export { useMyApplications, useMyApplication } from './useMyApplications';
 export { useSettlement } from './useSettlement';
 export { usePastMeetings, usePastMeeting } from './usePastMeetings';
 export { usePartyPool } from './usePartyPool';
+export { useAuth, AuthContext } from './useAuth';
