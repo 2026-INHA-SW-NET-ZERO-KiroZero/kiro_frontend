@@ -6,6 +6,7 @@ export { me } from './me';
 export { allergyAll } from './allergies';
 export { rooms } from './rooms';
 export { aggIngredients } from './aggIngredients';
+export { ingredients } from './ingredients';
 export { menuCandidates, voteMenus, decidedMenu } from './menus';
 export { notifData } from './notifications';
 export { myApplications } from './applications';
