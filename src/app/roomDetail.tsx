@@ -37,10 +37,14 @@ export default function RoomDetailScreen() {
   const { data: partyPool } = usePartyPool();
   const { data: aggList } = useAggIngredients();
 
+  // 신청 시 본인 인원이 추가되어 정원이 채워진다(3/4 → 4/4 매치 확정).
+  const baseCount = room?.baseCount ?? 3;
+  const liveCount = baseCount + (joined ? 1 : 0);
+
   const display = roomDisplay({
     state: heroStatus,
     capacity: room?.capacity ?? 4,
-    count: room?.baseCount ?? 3,
+    count: liveCount,
     joined,
     hasMenu,
   });
@@ -312,6 +316,11 @@ export default function RoomDetailScreen() {
         onSubmit={() => {
           setJoined(true);
           setShowJoinSheet(false);
+          // 정원이 가득 차면(3/4 → 4/4) 매치 확정 → 투표 페이지로 이동.
+          const willBeFull = baseCount + 1 >= (room.capacity ?? 4);
+          if (willBeFull) {
+            router.push('/myApplication');
+          }
         }}
       />
     </SafeAreaView>
