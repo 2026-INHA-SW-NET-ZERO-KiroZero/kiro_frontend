@@ -95,6 +95,27 @@ export const color = {
   redBgSoft2: '#FDEBEC', // allergy chip bg
   redBgSoft3: '#FFE9E7',
   greyChipBg: '#F1EAE2', // "마감", neutral chip bg
+
+  // ---- 지난 모임 · 모임 평가 (pastApplication / pastEval, §3.10·§3.11) ----
+  ctaRedBg: '#FFF1F0', // "아직 평가하지 않았어요" CTA 배경
+  ctaRedBorder: '#FFD3CF', // 〃 테두리
+  ctaRedText: '#C2554E', // 〃 보조 설명 텍스트
+  doneBannerBg: '#FFF0ED', // "모임 평가를 완료했어요" 배너 배경
+  doneBannerBorder: '#FBD9D0', // 〃 테두리
+  doneBannerText: '#E23B2E', // 〃 텍스트
+  slabCaption: '#A6DDD1', // 탄소 슬랩 co2 캡션(ecoTint보다 연함)
+  slabRingFill: '#9BE3CF', // 탄소 슬랩 소진율 링 채움
+  slabRingTrack: 'rgba(255,255,255,0.22)', // 〃 링 트랙(미채움)
+  refundRingTrack: 'rgba(0,0,0,0.06)', // 환급 점수 링 트랙
+  refundDotUse: '#3B9E86', // 환급 내역 '재료 소진율' 점
+  refundDotEat: '#7FC9B5', // 환급 내역 '완성 음식 소비율' 점
+  barTrackEco: '#EAF4F0', // 소비율 바 트랙(green)
+  barTrackWarm: '#F3ECE4', // 재료 소진율 바 트랙(red)
+  menuTimeBrown: '#B5764A', // 함께 만든 메뉴 '조리 N분 · 4인분'
+  uploadTileBg: '#F4EEE7', // 인증 사진 dashed 업로드 타일 배경
+  uploadTileBorder: '#D8CDC0', // 〃 dashed 테두리
+  uploadIcon: '#B0A89E', // 〃 add_a_photo 아이콘
+  segIdleBorder: '#ECE4DB', // 0/25/.../100% 미선택 칩 테두리
 } as const;
 
 /** Gradients — feed arrays straight into expo-linear-gradient `colors`. Default start/end = diagonal. */
@@ -103,6 +124,9 @@ export const gradient = {
   brandWarm: ['#FF443D', '#FF7A52'], // MY card / report hero (120deg)
   cream: ['#FFF3E0', '#FDEEE8'], // chosen-menu / decided-menu cards (105–110deg)
   creamBd: '#F6DFC9', // border that pairs with `cream`
+  ecoBar: ['#36BA9A', '#1F8676'], // 완성 음식 소비율 바 (90deg)
+  redBar: ['#FF6A5C', '#FF443D'], // 재료 소진율 바 (90deg)
+  photoScrim: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)'], // 인증 사진 하단 오버레이(↓)
 } as const;
 
 /**
