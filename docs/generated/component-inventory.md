@@ -27,13 +27,17 @@
 
 ## 화면 컴포넌트 (`src/features/`)
 
-| 컴포넌트      | 경로                                  | 분류          | props 수 | 사용처                 |
-| ------------- | ------------------------------------- | ------------- | -------- | ---------------------- |
-| HomeScreen    | `src/features/home/HomeScreen.tsx`    | 혼합형(훅+UI) | 0        | `(tabs)/home` 라우트   |
-| LocationSheet | `src/features/home/LocationSheet.tsx` | 프레젠테이션  | 4        | HomeScreen (지역 필터) |
+| 컴포넌트             | 경로                                          | 분류          | props 수 | 사용처                      |
+| -------------------- | --------------------------------------------- | ------------- | -------- | --------------------------- |
+| HomeScreen           | `src/features/home/HomeScreen.tsx`            | 혼합형(훅+UI) | 0        | `(tabs)/home` 라우트        |
+| LocationSheet        | `src/features/home/LocationSheet.tsx`         | 프레젠테이션  | 4        | HomeScreen (지역 필터)      |
+| MeetingsScreen       | `src/features/meetings/MeetingsScreen.tsx`    | 혼합형(훅+UI) | 0        | `(tabs)/meetings` 라우트    |
+| MyApplicationScreen  | `src/features/meetings/MyApplicationScreen.tsx` | 혼합형(훅+UI) | 0      | `myApplication` 라우트      |
 
 > HomeScreen은 `useHomeRooms()`(추천/열린 방 카드)·`useMe()`(추천 헤더)·`useNotifications()`(알림 dot) 훅으로만 데이터에 접근한다(PRD §3.3 · §3.16).
 > LocationSheet props: `visible` · `selected` · `onSelect` · `onClose`. 표시/선택 상태는 HomeScreen이 소유한다(프레젠테이션).
+> MeetingsScreen(PRD §3.8): `useMyApplications()`·`usePastMeetings()`·`useNotifications()` 훅 경유. 캘린더 그리드는 `src/features/meetings/calendar.ts`(순수 함수).
+> MyApplicationScreen(PRD §3.9): `useMyApplication(id)`·`usePartyPool()`·`useVoteMenus()`·`useDecidedMenu()` 훅 경유. stage(canceled/recruiting/voting/result)는 화면 로컬 파생. theme `applicationStage` 토큰 그룹 신설(투표/결과 단계 전용 색).
 
 ## 라우트 (`src/app/` — Expo Router)
 

@@ -1,5 +1,5 @@
-import { Placeholder } from '@/components/Placeholder';
+import { MyApplicationScreen } from '@/features/meetings/MyApplicationScreen';
 
-export default function MyApplicationScreen() {
-  return <Placeholder title="신청 내역" subtitle="My Application (골격)" showBack />;
+export default function MyApplicationRoute() {
+  return <MyApplicationScreen />;
 }
