@@ -3,8 +3,10 @@ import { type ComponentProps } from 'react';
 
 import { color } from '@/theme/theme';
 
+export type IconName = ComponentProps<typeof MaterialIcons>['name'];
+
 type IconProps = {
-  name: ComponentProps<typeof MaterialIcons>['name'];
+  name: IconName;
   size?: number;
   color?: string;
 };
