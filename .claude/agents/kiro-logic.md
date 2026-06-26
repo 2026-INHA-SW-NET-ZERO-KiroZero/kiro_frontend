@@ -31,6 +31,17 @@ KiroZero의 전역 상태(`src/stores/`), 커스텀 훅(`src/hooks/`, `src/featu
 - Hook 린트/타입 에러는 1차로 스스로 고친다. `as unknown as X` 식 강제 캐스팅으로 우회하지 않는다 — 타입 가드를 쓴다.
 - PRD 파생 계산이 모호하면 임의 추정 대신 프로토타입 소스(`KiroZero.dc.html`의 `class Component`)에서 실제 로직을 확인한다.
 
+## API 연동 프로토콜 (백엔드 붙일 때 — 필수)
+
+더미데이터를 실제 API로 교체하는 작업은 **추측으로 진행하지 않는다.** 코드 작성 전에 반드시:
+
+1. 전달받은 **백엔드 Swagger를 먼저 확인**한다(엔드포인트 method·path·요청/응답 shape).
+2. `docs/generated/api-schema.md`(저장된 명세서)와 **항목별로 대조**한다.
+3. **일치할 때만** 구현한다. 불일치면 코드 작성 금지 — 우리 명세가 옛것이면 갱신, 백엔드가 합의와 다르면 백엔드 팀에 알리고 보류(필요 시 이슈 생성). 임의로 필드를 추측해 만들지 않는다.
+4. 훅 **내부만** API 호출로 교체하고 UI/타입 shape은 유지한다. Swagger 스냅샷을 `docs/references/`에 저장하고 `api-schema.md`를 동기화한다.
+
+> 상세 절차: `docs/API-INTEGRATION.md`. (백엔드 미완성 단계에서는 더미데이터 + 교체 가능한 훅까지만 구현한다.)
+
 ## 협업 / 팀 통신 프로토콜
 
 - **kiro-ui에게:** 훅/스토어 시그니처와 반환 shape을 명확히 전달한다("`useRoomDetail(id)` → `{ room, participants, cta, status }`").

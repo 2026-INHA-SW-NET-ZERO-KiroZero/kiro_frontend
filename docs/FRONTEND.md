@@ -62,6 +62,7 @@ src/
 
 - `src/data/`의 시드를 **직접 import 금지**. 반드시 `useRooms()`, `useRoomDetail(id)`, `useNotifications()` 같은 훅으로 감싼다.
 - 훅이 로딩/에러/빈 상태를 반환하도록 설계해, 백엔드 연동 시 훅 내부만 API 호출로 교체한다(PRD §5).
+- **API 연동은 반드시 `docs/API-INTEGRATION.md` 절차를 따른다**: 코드 작성 전 백엔드 Swagger를 먼저 확인하고 `docs/generated/api-schema.md`와 대조해 **일치할 때만** 구현한다. 불일치를 추측으로 메우지 않는다.
 
 ## 7. 파생 계산 (PRD §4.3 — `src/lib/derive.ts`에 모음, 정확히 복제)
 

@@ -24,7 +24,11 @@
 4. **`any` 금지.** 불확실하면 `unknown` + 타입 가드. `as unknown as X` 캐스팅 금지.
 5. **한국어 카피는 PRD/프로토타입 문자열 그대로.** 임의로 다시 쓰지 않는다.
 
-> 상세: `docs/FRONTEND.md`(코드), `docs/DESIGN.md`(디자인), `docs/TESTING.md`(테스트), `docs/PR-writing-guide.md`(PR).
+> 상세: `docs/FRONTEND.md`(코드), `docs/DESIGN.md`(디자인), `docs/TESTING.md`(테스트), `docs/PR-writing-guide.md`(PR), `docs/API-INTEGRATION.md`(API 연동).
+
+## API 연동 규칙
+
+- API 연동은 **백엔드 Swagger를 먼저 확인** → `docs/generated/api-schema.md`와 대조 → **일치할 때만** 구현. 불일치를 추측으로 메우지 않는다(`docs/API-INTEGRATION.md`). 백엔드 미완성 단계에서는 더미데이터 유지.
 
 ## .claude/ 구조
 
