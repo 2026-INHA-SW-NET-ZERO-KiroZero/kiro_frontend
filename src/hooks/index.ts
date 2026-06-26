@@ -13,4 +13,7 @@ export { useMyApplications, useMyApplication } from './useMyApplications';
 export { useSettlement } from './useSettlement';
 export { usePastMeetings, usePastMeeting } from './usePastMeetings';
 export { usePartyPool } from './usePartyPool';
+export { useReport } from './useReport';
+export type { ReportBar, ReportView, UseReportResult } from './useReport';
 export { useAuth, AuthContext } from './useAuth';
+export { useProfile, ProfileContext, useProfileProvider } from './useProfile';
