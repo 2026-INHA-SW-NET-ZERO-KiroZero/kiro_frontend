@@ -1,16 +1,5 @@
-import { Placeholder } from '@/components/Placeholder';
+import { HomeScreen } from '@/features/home/HomeScreen';
 
-export default function HomeScreen() {
-  return (
-    <Placeholder
-      title="홈"
-      subtitle="Home (골격)"
-      links={[
-        { href: '/roomDetail', label: '방 상세' },
-        { href: '/recommend', label: 'AI 추천' },
-        { href: '/notifications', label: '알림' },
-        { href: '/components-demo', label: '컴포넌트 데모' },
-      ]}
-    />
-  );
+export default function HomeRoute() {
+  return <HomeScreen />;
 }
