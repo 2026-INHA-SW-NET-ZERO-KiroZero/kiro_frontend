@@ -9,36 +9,13 @@ import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
 /** 리포트 화면 (PRD §3.12). 월별 절감 추이 + 누적 stat. */
 export default function ReportScreen() {
-  const {
-    report,
-    bars,
-    co2,
-    monthLabel,
-    canPrev,
-    canNext,
-    prevMonth,
-    nextMonth,
-    loading,
-    isEmpty,
-  } = useReport();
+  const { report, bars, co2, monthLabel, canPrev, canNext, prevMonth, nextMonth, loading } =
+    useReport();
 
   if (loading) {
     return (
       <SafeAreaView style={[styles.safe, styles.center]} edges={['top']}>
         <ActivityIndicator color={color.brand} />
-      </SafeAreaView>
-    );
-  }
-
-  if (isEmpty) {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
-        <View style={styles.header}>
-          <Text style={styles.title}>리포트</Text>
-        </View>
-        <View style={[styles.center, styles.emptyWrap]}>
-          <Text style={styles.emptyText}>아직 완료한 모임이 없어요</Text>
-        </View>
       </SafeAreaView>
     );
   }
@@ -155,13 +132,6 @@ function StatCard({ icon, value, unit, label }: StatCardProps) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: color.appBg },
   center: { alignItems: 'center', justifyContent: 'center' },
-  emptyWrap: { flex: 1 },
-  emptyText: {
-    fontSize: font.size.bodySm,
-    fontFamily: font.family.semibold,
-    color: color.textMute,
-    letterSpacing: font.tracking.snug,
-  },
   header: { paddingHorizontal: space.screenX, paddingTop: space.sm, paddingBottom: space.x2 },
   title: {
     fontSize: font.size.h2,
