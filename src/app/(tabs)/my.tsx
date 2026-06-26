@@ -33,8 +33,6 @@ export default function MyScreen() {
         <View style={styles.profileRow}>
           <View style={styles.profileText}>
             <Text style={styles.name}>{me.name}</Text>
-            <Text style={styles.dept}>{me.dept}</Text>
-            <Text style={styles.email}>{me.email}</Text>
           </View>
           <Pressable onPress={() => router.push('/editProfile')} hitSlop={6} style={styles.editBtn}>
             <Text style={styles.editBtnText}>프로필 수정</Text>
@@ -150,20 +148,6 @@ const styles = StyleSheet.create({
     fontFamily: font.family.bold,
     color: color.ink,
     letterSpacing: font.tracking.tightH,
-  },
-  dept: {
-    fontSize: font.size.cap,
-    fontFamily: font.family.semibold,
-    color: color.textMute,
-    marginTop: space.sm - 1,
-    letterSpacing: font.tracking.snug,
-  },
-  email: {
-    fontSize: font.size.capSm,
-    fontFamily: font.family.semibold,
-    color: color.textFaint,
-    marginTop: 2,
-    letterSpacing: font.tracking.snug,
   },
   editBtn: {
     backgroundColor: color.neutralBtnBg,
