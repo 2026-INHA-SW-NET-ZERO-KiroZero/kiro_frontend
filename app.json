@@ -8,13 +8,13 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.teampaycheck.kirozero",
+      "bundleIdentifier": "com.l2juhan.kirozero",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.teampaycheck.kirozero",
+      "package": "com.l2juhan.kirozero",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
