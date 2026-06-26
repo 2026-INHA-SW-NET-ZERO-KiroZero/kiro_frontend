@@ -1,5 +1,16 @@
 /** 공유 타입 barrel (PRD §5 shape). UI/훅/스토어는 여기서 import한다. */
 export type { SkillLevel, Me, AllergyOption } from './user';
+export type {
+  CookingSkill,
+  SkillLabel,
+  SignupRequest,
+  LoginRequest,
+  AuthResponse,
+  CurrentUserResponse,
+  AllergyTagItemResponse,
+  AllergyTagListResponse,
+} from './auth';
+export { SKILL_TO_SERVER, SKILL_TO_LABEL } from './auth';
 export type { RoomParticipant, Room, AggIngredient, PartyBring, PartyProfile } from './room';
 export type { AllergenTag, Ingredient } from './ingredient';
 export type {

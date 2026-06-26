@@ -3,6 +3,8 @@
  * 한국어 카피는 PRD 원문 그대로 사용한다(임의로 다시 쓰지 않음).
  */
 
+import type { SkillLabel } from '@/types/auth';
+
 /** 인하대 이메일 도메인 (PRD §3.2 · §7). */
 export const INHA_EMAIL_DOMAIN = /@(inha\.ac\.kr|inha\.edu)$/i;
 
@@ -53,4 +55,24 @@ export function isVoteValid(selectedKey: string | null, reason: string): boolean
   if (!selectedKey) return false;
   if (selectedKey === 'E') return reason.trim() !== '';
   return true;
+}
+
+/** Signup: 비밀번호 minLength 8 (서버 Swagger 확정값). */
+export function isPasswordValid(password: string): boolean {
+  return password.length >= 8;
+}
+
+/** Signup: 가입 버튼 활성화 기준 — 인하 도메인 + 비밀번호 8자+ + 닉네임 + 숙련도 선택. */
+export function isSignupFormValid(
+  email: string,
+  password: string,
+  nickname: string,
+  cookingSkill: SkillLabel | null,
+): boolean {
+  return (
+    isSignupEmailValid(email) &&
+    isPasswordValid(password) &&
+    nickname.trim() !== '' &&
+    cookingSkill !== null
+  );
 }

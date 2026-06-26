@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
+import { useAuth } from '@/hooks/useAuth';
 import { useAllergyOptions, useMe, useProfile, useReport } from '@/hooks';
 import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
@@ -13,8 +14,14 @@ export default function MyScreen() {
   const { currentSaved } = useReport();
   const { skillLevel, allergies } = useProfile();
   const { data: allergyOptions } = useAllergyOptions();
+  const { logout } = useAuth();
 
   const allergyChips = allergyOptions.filter((a) => allergies.includes(a.label));
+
+  const onLogout = async () => {
+    await logout();
+    router.replace('/(auth)/login');
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -111,6 +118,11 @@ export default function MyScreen() {
             <Icon name="chevron-right" size={21} color={color.iconFaint} />
           </Pressable>
         </View>
+
+        {/* 로그아웃 */}
+        <Pressable style={styles.logout} onPress={onLogout} hitSlop={8}>
+          <Text style={styles.logoutText}>로그아웃</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -283,6 +295,18 @@ const styles = StyleSheet.create({
     fontSize: font.size.bodySm,
     fontFamily: font.family.semibold,
     color: color.listInk,
+    letterSpacing: font.tracking.snug,
+  },
+
+  logout: {
+    alignItems: 'center',
+    paddingVertical: space.x8,
+    marginTop: space.x6,
+  },
+  logoutText: {
+    fontSize: font.size.bodySm,
+    fontFamily: font.family.semibold,
+    color: color.textMute,
     letterSpacing: font.tracking.snug,
   },
 });
