@@ -14,11 +14,6 @@ function formatSlotDate(iso: string): string {
   return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')} (${days[d.getDay()]})`;
 }
 
-function todayISO(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 function slotItemToRoom(slot: SlotListItemResponse): Room {
   return {
     id: String(slot.slotId),
@@ -55,11 +50,11 @@ function slotDetailToRoom(slot: SlotDetailResponse): Room {
   };
 }
 
-/** 오늘 열린 방 목록. */
-export function useRooms(): AsyncResult<Room[]> {
+/** 지정한 날짜(ISO)의 방 목록. */
+export function useRooms(date: string): AsyncResult<Room[]> {
   const fetcher = useCallback(
-    () => listSlots(todayISO(), 'OPEN').then((res) => res.slots.map(slotItemToRoom)),
-    [],
+    () => listSlots(date).then((res) => res.slots.map(slotItemToRoom)),
+    [date],
   );
   return useApiData(fetcher, { initial: [], isEmpty: (d) => d.length === 0 });
 }

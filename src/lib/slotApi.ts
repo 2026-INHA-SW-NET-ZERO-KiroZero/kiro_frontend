@@ -20,15 +20,31 @@ export function listSlots(date: string, status?: string): Promise<SlotListRespon
 
 /** 슬롯 상세. `GET /api/v1/slots/{slotId}` */
 export function getSlotDetail(slotId: number): Promise<SlotDetailResponse> {
-  return apiRequest<SlotDetailResponse>(`/slots/${slotId}`);
+  console.warn(`GET /api/v1/slots/${slotId} request:`, { slotId });
+  return apiRequest<SlotDetailResponse>(`/slots/${slotId}`).then((res) => {
+    console.warn(`GET /api/v1/slots/${slotId} response:`, res);
+    return res;
+  });
 }
 
 /** 방 참여(재료 등록). `POST /api/v1/slots/{slotId}/join` */
 export function joinSlot(slotId: number, body: JoinSlotRequest): Promise<JoinSlotResponse> {
-  return apiRequest<JoinSlotResponse>(`/slots/${slotId}/join`, { method: 'POST', body });
+  console.warn(`POST /api/v1/slots/${slotId}/join request:`, body);
+  return apiRequest<JoinSlotResponse>(`/slots/${slotId}/join`, { method: 'POST', body }).then(
+    (res) => {
+      console.warn(`POST /api/v1/slots/${slotId}/join response:`, res);
+      return res;
+    },
+  );
 }
 
 /** 방 나가기. `DELETE /api/v1/slots/{slotId}/join` */
 export function leaveSlot(slotId: number): Promise<LeaveSlotResponse> {
-  return apiRequest<LeaveSlotResponse>(`/slots/${slotId}/join`, { method: 'DELETE' });
+  console.warn(`DELETE /api/v1/slots/${slotId}/join request:`, { slotId });
+  return apiRequest<LeaveSlotResponse>(`/slots/${slotId}/join`, { method: 'DELETE' }).then(
+    (res) => {
+      console.warn(`DELETE /api/v1/slots/${slotId}/join response:`, res);
+      return res;
+    },
+  );
 }

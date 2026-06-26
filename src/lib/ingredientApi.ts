@@ -8,5 +8,9 @@ import type { IngredientSearchResponse } from '@/types/ingredient';
 /** 재료 검색. `GET /api/v1/ingredients?keyword={keyword}` */
 export function searchIngredients(keyword: string): Promise<IngredientSearchResponse> {
   const params = new URLSearchParams({ keyword });
-  return apiRequest<IngredientSearchResponse>(`/ingredients?${params.toString()}`);
+  console.warn(`GET /api/v1/ingredients request:`, { keyword });
+  return apiRequest<IngredientSearchResponse>(`/ingredients?${params.toString()}`).then((res) => {
+    console.warn(`GET /api/v1/ingredients response:`, res);
+    return res;
+  });
 }
