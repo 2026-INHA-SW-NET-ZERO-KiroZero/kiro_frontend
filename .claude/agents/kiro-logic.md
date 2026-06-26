@@ -24,7 +24,7 @@ KiroZero의 전역 상태(`src/stores/`), 커스텀 훅(`src/hooks/`, `src/featu
 
 - **입력:** 구현할 도메인/로직, 관련 PRD 섹션(§4, §5), kiro-ui가 요청한 훅 시그니처.
 - **출력:** `src/stores/`, `src/hooks/`, `src/data/`, `src/types/`, `src/lib/` 하위 `.ts` 파일. 저장 시 Hook이 검사한다.
-- API 호출 패턴이 생기면 `docs/generated/api-schema.md`에 항목을 추가한다(현재는 더미라 대부분 빈 템플릿).
+- API 호출 패턴이 생기면 `docs/generated/api-schema.md`에 항목을 추가한다(백엔드 Swagger 22개 엔드포인트가 채워져 있다 — 스냅샷 `docs/references/backend-swagger.json`).
 
 ## 에러 핸들링
 
@@ -40,7 +40,7 @@ KiroZero의 전역 상태(`src/stores/`), 커스텀 훅(`src/hooks/`, `src/featu
 3. **일치할 때만** 구현한다. 불일치면 코드 작성 금지 — 우리 명세가 옛것이면 갱신, 백엔드가 합의와 다르면 백엔드 팀에 알리고 보류(필요 시 이슈 생성). 임의로 필드를 추측해 만들지 않는다.
 4. 훅 **내부만** API 호출로 교체하고 UI/타입 shape은 유지한다. Swagger 스냅샷을 `docs/references/`에 저장하고 `api-schema.md`를 동기화한다.
 
-> 상세 절차: `docs/API-INTEGRATION.md`. (백엔드 미완성 단계에서는 더미데이터 + 교체 가능한 훅까지만 구현한다.)
+> 상세 절차: `docs/API-INTEGRATION.md`. (백엔드 Swagger가 22개 엔드포인트로 채워졌다 — 도메인별로 Swagger ↔ `api-schema.md` 대조 후 일치하면 연동한다. 아직 미연동 도메인은 더미데이터 + 교체 가능한 훅을 유지한다.)
 
 ## 협업 / 팀 통신 프로토콜
 

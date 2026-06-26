@@ -28,7 +28,7 @@
 
 ## API 연동 규칙
 
-- API 연동은 **백엔드 Swagger를 먼저 확인** → `docs/generated/api-schema.md`와 대조 → **일치할 때만** 구현. 불일치를 추측으로 메우지 않는다(`docs/API-INTEGRATION.md`). 백엔드 미완성 단계에서는 더미데이터 유지.
+- API 연동은 **백엔드 Swagger를 먼저 확인** → `docs/generated/api-schema.md`와 대조 → **일치할 때만** 구현. 불일치를 추측으로 메우지 않는다(`docs/API-INTEGRATION.md`). 백엔드 Swagger는 엔드포인트 22개로 채워진 상태(2026-06-27, 서버 `https://umc-lxd.shop/`, 스냅샷 `docs/references/backend-swagger.json`) — 도메인별로 대조 후 연동하고, 아직 미연동 도메인은 더미데이터를 유지한다.
 
 ## .claude/ · .githooks/ 구조
 
