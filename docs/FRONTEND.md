@@ -33,6 +33,14 @@ src/
 
 - 도메인 전용 컴포넌트는 `features/{도메인}/components/`. 2개 이상 도메인이 쓰면 `src/components/`로 승격.
 
+### 2.1 네비게이션 골격 (issue #2 구현)
+
+- 엔트리포인트는 `expo-router/entry`(`package.json` main). `app.json`: `plugins: ["expo-router"]`, `scheme: "kirozero"`, `experiments.typedRoutes: true`. babel은 `babel-preset-expo`.
+- 라우트 루트는 `src/app/`. 구조: `(auth)/login·signup`(탭바·백스택 없음) · `(tabs)/home·meetings·report·my`(4탭) · 나머지는 root stack에 push되며 탭바를 가린다(roomDetail·recommend·usage·settlement·myApplication·pastApplication·pastEval·editProfile·notifications).
+- 부팅 진입: `index.tsx` → `(auth)/login` 리다이렉트. 로그인 성공 → `(tabs)/home`(현재는 골격 버튼, 인증 스토어는 후속 이슈).
+- 탭바: 활성 `color.brand` + filled / 비활성 `color.textFaint2` + outline 아이콘(Ionicons). 색은 theme 토큰만 사용.
+- 화면은 모두 `src/components/Placeholder.tsx`(빈 SafeAreaView + 화면명)로 채워져 있고, 후속 화면 이슈에서 `features/{도메인}`의 실제 화면으로 교체된다.
+
 ## 3. 컴포넌트 패턴 (혼합형)
 
 - **공용 컴포넌트(`src/components/`)는 프레젠테이션** — props만 받고 로직/데이터 페칭 없음.

@@ -3,6 +3,7 @@
     "name": "KiroZero",
     "slug": "kiro-zero",
     "version": "1.0.0",
+    "scheme": "kirozero",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -31,6 +32,10 @@
       "eas": {
         "projectId": "4f7c93f4-5534-4ae8-98fb-d4bfb4a47519"
       }
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }
