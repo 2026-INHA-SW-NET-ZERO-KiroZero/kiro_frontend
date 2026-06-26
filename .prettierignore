@@ -8,3 +8,6 @@ android
 ios
 assets
 .history
+.claude
+docs/references
+docs/generated

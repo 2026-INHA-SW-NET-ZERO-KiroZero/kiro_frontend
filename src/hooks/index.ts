@@ -11,6 +11,7 @@ export { useAggIngredients } from './useAggIngredients';
 export { useIngredients } from './useIngredients';
 export { useMenuCandidates, useVoteMenus, useDecidedMenu } from './useMenus';
 export { useNotifications } from './useNotifications';
+export type { NotifResult } from './useNotifications';
 export { useMyApplications, useMyApplication } from './useMyApplications';
 export { useSettlement } from './useSettlement';
 export { usePastMeetings, usePastMeeting } from './usePastMeetings';

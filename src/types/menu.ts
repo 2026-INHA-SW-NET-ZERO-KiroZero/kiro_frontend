@@ -25,6 +25,10 @@ export interface MenuCandidate {
   needed: IngredientNeed[];
   /** 추가 구매 필요 재료 (없으면 빈 배열). */
   missing: IngredientNeed[];
+  /** 저탄소 메뉴 여부. */
+  type: '저탄소' | '일반';
+  /** 탄소 배출량 표기 (예: '0.8kg CO₂'). */
+  co2: string;
 }
 
 /** 투표 후보 메뉴 (myApplication 투표 단계). E(재추천)는 인덱스 4의 합성 옵션. */

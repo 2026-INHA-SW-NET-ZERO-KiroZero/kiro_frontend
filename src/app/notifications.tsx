@@ -1,5 +1,5 @@
-import { Placeholder } from '@/components/Placeholder';
+import { NotificationsScreen } from '@/features/notifications/NotificationsScreen';
 
-export default function NotificationsScreen() {
-  return <Placeholder title="알림" subtitle="Notifications (골격)" showBack />;
+export default function NotificationsRoute() {
+  return <NotificationsScreen />;
 }

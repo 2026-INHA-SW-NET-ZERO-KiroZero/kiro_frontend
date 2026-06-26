@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "KiroZero Backend API",
-    "description": "\ub0c9\uc7a5\uace0 \ubc18\uc0c1\ud68c MVP \ubc31\uc5d4\ub4dc API \ubb38\uc11c",
+    "description": "냉장고 반상회 MVP 백엔드 API 문서",
     "version": "v1.0.0"
   },
   "servers": [
@@ -14,7 +14,9 @@
   "paths": {
     "/api/v1/sessions/{slotId}/ingredients": {
       "put": {
-        "tags": ["session-controller"],
+        "tags": [
+          "session-controller"
+        ],
         "operationId": "updateIngredients",
         "parameters": [
           {
@@ -66,7 +68,9 @@
     },
     "/api/v1/me/profile": {
       "put": {
-        "tags": ["profile-controller"],
+        "tags": [
+          "profile-controller"
+        ],
         "operationId": "updateProfile",
         "parameters": [
           {
@@ -109,7 +113,9 @@
     },
     "/api/v1/uploads": {
       "post": {
-        "tags": ["upload-controller"],
+        "tags": [
+          "upload-controller"
+        ],
         "operationId": "uploadPhoto",
         "parameters": [
           {
@@ -119,13 +125,17 @@
             "schema": {
               "type": "string",
               "default": "GENERAL",
-              "enum": ["COOKED_PHOTO", "AFTER_PHOTO", "GENERAL"]
+              "enum": [
+                "COOKED_PHOTO",
+                "AFTER_PHOTO",
+                "GENERAL"
+              ]
             }
           }
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -134,7 +144,9 @@
                     "format": "binary"
                   }
                 },
-                "required": ["file"]
+                "required": [
+                  "file"
+                ]
               }
             }
           }
@@ -155,7 +167,9 @@
     },
     "/api/v1/slots/{slotId}/join": {
       "post": {
-        "tags": ["slot-controller"],
+        "tags": [
+          "slot-controller"
+        ],
         "operationId": "joinSlot",
         "parameters": [
           {
@@ -205,7 +219,9 @@
         ]
       },
       "delete": {
-        "tags": ["slot-controller"],
+        "tags": [
+          "slot-controller"
+        ],
         "operationId": "leaveSlot",
         "parameters": [
           {
@@ -247,7 +263,9 @@
     },
     "/api/v1/sessions/{slotId}/votes": {
       "post": {
-        "tags": ["menu-vote-controller"],
+        "tags": [
+          "menu-vote-controller"
+        ],
         "operationId": "vote",
         "parameters": [
           {
@@ -299,7 +317,9 @@
     },
     "/api/v1/sessions/{slotId}/recommendations": {
       "post": {
-        "tags": ["recommendation-controller"],
+        "tags": [
+          "recommendation-controller"
+        ],
         "operationId": "recommend",
         "parameters": [
           {
@@ -350,7 +370,9 @@
     },
     "/api/v1/sessions/{slotId}/consumption-records": {
       "post": {
-        "tags": ["consumption-result-controller"],
+        "tags": [
+          "consumption-result-controller"
+        ],
         "operationId": "createRecord",
         "parameters": [
           {
@@ -402,7 +424,9 @@
     },
     "/api/v1/demo/seed": {
       "post": {
-        "tags": ["demo-seed-controller"],
+        "tags": [
+          "demo-seed-controller"
+        ],
         "operationId": "seed",
         "responses": {
           "200": {
@@ -420,7 +444,9 @@
     },
     "/api/v1/auth/signup": {
       "post": {
-        "tags": ["auth-controller"],
+        "tags": [
+          "auth-controller"
+        ],
         "operationId": "signup",
         "requestBody": {
           "content": {
@@ -448,7 +474,9 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "tags": ["auth-controller"],
+        "tags": [
+          "auth-controller"
+        ],
         "operationId": "login",
         "requestBody": {
           "content": {
@@ -476,7 +504,9 @@
     },
     "/api/v1/slots": {
       "get": {
-        "tags": ["slot-controller"],
+        "tags": [
+          "slot-controller"
+        ],
         "operationId": "getSlots",
         "parameters": [
           {
@@ -494,7 +524,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+              "enum": [
+                "OPEN",
+                "MENU_PROPOSED",
+                "COMPLETED"
+              ]
             }
           }
         ],
@@ -514,7 +548,9 @@
     },
     "/api/v1/slots/{slotId}": {
       "get": {
-        "tags": ["slot-controller"],
+        "tags": [
+          "slot-controller"
+        ],
         "operationId": "getSlot",
         "parameters": [
           {
@@ -524,6 +560,14 @@
             "schema": {
               "type": "integer",
               "format": "int64"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -543,7 +587,9 @@
     },
     "/api/v1/sessions/{slotId}": {
       "get": {
-        "tags": ["session-controller"],
+        "tags": [
+          "session-controller"
+        ],
         "operationId": "getSessionStatus",
         "parameters": [
           {
@@ -572,7 +618,9 @@
     },
     "/api/v1/sessions/{slotId}/result": {
       "get": {
-        "tags": ["consumption-result-controller"],
+        "tags": [
+          "consumption-result-controller"
+        ],
         "operationId": "getSessionResult",
         "parameters": [
           {
@@ -614,7 +662,9 @@
     },
     "/api/v1/sessions/{slotId}/recommendations/latest": {
       "get": {
-        "tags": ["recommendation-controller"],
+        "tags": [
+          "recommendation-controller"
+        ],
         "operationId": "getLatestRecommendation",
         "parameters": [
           {
@@ -656,7 +706,9 @@
     },
     "/api/v1/sessions/{slotId}/cooking-guide": {
       "get": {
-        "tags": ["session-controller"],
+        "tags": [
+          "session-controller"
+        ],
         "operationId": "getCookingGuide",
         "parameters": [
           {
@@ -707,7 +759,9 @@
     },
     "/api/v1/sessions/{slotId}/checklist": {
       "get": {
-        "tags": ["session-controller"],
+        "tags": [
+          "session-controller"
+        ],
         "operationId": "getChecklist",
         "parameters": [
           {
@@ -747,9 +801,90 @@
         ]
       }
     },
+    "/api/v1/me/sessions": {
+      "get": {
+        "tags": [
+          "my-session-controller"
+        ],
+        "operationId": "getMySessions",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySessionListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/sessions/{slotId}": {
+      "get": {
+        "tags": [
+          "my-session-controller"
+        ],
+        "operationId": "getMySession",
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySessionDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/me/results/total": {
       "get": {
-        "tags": ["consumption-result-controller"],
+        "tags": [
+          "consumption-result-controller"
+        ],
         "operationId": "getMyResultTotal",
         "parameters": [
           {
@@ -782,7 +917,9 @@
     },
     "/api/v1/ingredients": {
       "get": {
-        "tags": ["ingredient-controller"],
+        "tags": [
+          "ingredient-controller"
+        ],
         "operationId": "searchIngredients",
         "parameters": [
           {
@@ -810,7 +947,9 @@
     },
     "/api/v1/auth/me": {
       "get": {
-        "tags": ["auth-controller"],
+        "tags": [
+          "auth-controller"
+        ],
         "operationId": "me",
         "parameters": [
           {
@@ -843,7 +982,9 @@
     },
     "/api/v1/allergy-tags": {
       "get": {
-        "tags": ["allergy-tag-controller"],
+        "tags": [
+          "allergy-tag-controller"
+        ],
         "operationId": "getAllergyTags",
         "responses": {
           "200": {
@@ -878,7 +1019,10 @@
             "minimum": 0.01
           }
         },
-        "required": ["count", "ingredientId"]
+        "required": [
+          "count",
+          "ingredientId"
+        ]
       },
       "UpdateSessionIngredientsRequest": {
         "type": "object",
@@ -891,7 +1035,9 @@
             "minItems": 1
           }
         },
-        "required": ["items"]
+        "required": [
+          "items"
+        ]
       },
       "SessionIngredientResponse": {
         "type": "object",
@@ -942,7 +1088,11 @@
           },
           "cookingSkill": {
             "type": "string",
-            "enum": ["HIGH", "MEDIUM", "LOW"]
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
           },
           "allergyTags": {
             "type": "array",
@@ -951,7 +1101,10 @@
             }
           }
         },
-        "required": ["cookingSkill", "nickname"]
+        "required": [
+          "cookingSkill",
+          "nickname"
+        ]
       },
       "CurrentUserResponse": {
         "type": "object",
@@ -968,7 +1121,15 @@
           },
           "cookingSkill": {
             "type": "string",
-            "enum": ["HIGH", "MEDIUM", "LOW"]
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "cash": {
+            "type": "integer",
+            "format": "int32"
           },
           "allergyTags": {
             "type": "array",
@@ -1010,7 +1171,9 @@
             "minItems": 1
           }
         },
-        "required": ["ingredients"]
+        "required": [
+          "ingredients"
+        ]
       },
       "JoinSlotResponse": {
         "type": "object",
@@ -1025,7 +1188,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           },
           "canPurchase": {
             "type": "boolean"
@@ -1043,7 +1210,13 @@
         "properties": {
           "voteType": {
             "type": "string",
-            "enum": ["A", "B", "C", "D", "E"]
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E"
+            ]
           },
           "candidateLabel": {
             "type": "string"
@@ -1052,7 +1225,9 @@
             "type": "string"
           }
         },
-        "required": ["voteType"]
+        "required": [
+          "voteType"
+        ]
       },
       "MenuVoteResponse": {
         "type": "object",
@@ -1083,7 +1258,11 @@
           },
           "nextStatus": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           }
         }
       },
@@ -1224,7 +1403,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           },
           "candidates": {
             "type": "array",
@@ -1246,7 +1429,10 @@
             "format": "int32"
           }
         },
-        "required": ["sessionIngredientId", "useRate"]
+        "required": [
+          "sessionIngredientId",
+          "useRate"
+        ]
       },
       "CreateConsumptionRecordRequest": {
         "type": "object",
@@ -1271,7 +1457,12 @@
             "minItems": 1
           }
         },
-        "required": ["afterPhotoUrl", "cookedPhotoUrl", "finishedFoodRate", "items"]
+        "required": [
+          "afterPhotoUrl",
+          "cookedPhotoUrl",
+          "finishedFoodRate",
+          "items"
+        ]
       },
       "CreateConsumptionRecordResponse": {
         "type": "object",
@@ -1303,7 +1494,11 @@
           },
           "nextStatus": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           }
         }
       },
@@ -1346,7 +1541,11 @@
           },
           "cookingSkill": {
             "type": "string",
-            "enum": ["HIGH", "MEDIUM", "LOW"]
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
           },
           "allergyTags": {
             "type": "array",
@@ -1355,7 +1554,12 @@
             }
           }
         },
-        "required": ["cookingSkill", "email", "nickname", "password"]
+        "required": [
+          "cookingSkill",
+          "email",
+          "nickname",
+          "password"
+        ]
       },
       "AuthResponse": {
         "type": "object",
@@ -1372,7 +1576,15 @@
           },
           "cookingSkill": {
             "type": "string",
-            "enum": ["HIGH", "MEDIUM", "LOW"]
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "cash": {
+            "type": "integer",
+            "format": "int32"
           },
           "allergyTags": {
             "type": "array",
@@ -1398,7 +1610,10 @@
             "minLength": 1
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "SlotListItemResponse": {
         "type": "object",
@@ -1464,7 +1679,17 @@
           },
           "cookingSkill": {
             "type": "string",
-            "enum": ["HIGH", "MEDIUM", "LOW"]
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "allergyTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "canPurchase": {
             "type": "boolean"
@@ -1508,13 +1733,24 @@
           },
           "status": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           },
           "commonKit": {
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "joined": {
+            "type": "boolean"
+          },
+          "myParticipantId": {
+            "type": "integer",
+            "format": "int64"
           },
           "participants": {
             "type": "array",
@@ -1561,7 +1797,17 @@
           },
           "cookingSkill": {
             "type": "string",
-            "enum": ["HIGH", "MEDIUM", "LOW"]
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "allergyTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "canPurchase": {
             "type": "boolean"
@@ -1583,7 +1829,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           },
           "participants": {
             "type": "array",
@@ -1694,7 +1944,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           },
           "candidates": {
             "type": "array",
@@ -1865,6 +2119,172 @@
           }
         }
       },
+      "MySessionItemResponse": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "participantId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "date": {
+            "type": "string"
+          },
+          "placeName": {
+            "type": "string"
+          },
+          "stationCode": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          },
+          "timeLabel": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "participantCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
+          },
+          "canPurchase": {
+            "type": "boolean"
+          },
+          "myIngredientCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasRecommendation": {
+            "type": "boolean"
+          },
+          "hasSelectedMenu": {
+            "type": "boolean"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "selectedMenu": {
+            "$ref": "#/components/schemas/SelectedMenuSummaryResponse"
+          }
+        }
+      },
+      "MySessionListResponse": {
+        "type": "object",
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MySessionItemResponse"
+            }
+          }
+        }
+      },
+      "MySessionDetailResponse": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "myParticipantId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "joined": {
+            "type": "boolean"
+          },
+          "canPurchase": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
+          },
+          "myIngredients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionIngredientResponse"
+            }
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionStatusResponse"
+          },
+          "hasRecommendation": {
+            "type": "boolean"
+          },
+          "hasSelectedMenu": {
+            "type": "boolean"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "selectedMenu": {
+            "$ref": "#/components/schemas/SelectedMenuSummaryResponse"
+          }
+        }
+      },
+      "MonthlyResultSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "yearMonth": {
+            "type": "string"
+          },
+          "monthLabel": {
+            "type": "string"
+          },
+          "completedSessionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalUsedGrams": {
+            "type": "number"
+          },
+          "totalEstimatedCarbonSavedKgco2e": {
+            "type": "number"
+          },
+          "totalRefundAmount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "togetherPeopleCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "providedIngredientCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "usedIngredientCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageIngredientUseRate": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "MyResultTotalResponse": {
         "type": "object",
         "properties": {
@@ -1881,6 +2301,40 @@
           "totalRefundAmount": {
             "type": "integer",
             "format": "int32"
+          },
+          "togetherPeopleCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "providedIngredientCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "usedIngredientCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageIngredientUseRate": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentMonthEstimatedCarbonSavedKgco2e": {
+            "type": "number"
+          },
+          "previousMonthEstimatedCarbonSavedKgco2e": {
+            "type": "number"
+          },
+          "monthOverMonthCarbonDeltaKgco2e": {
+            "type": "number"
+          },
+          "insightMessage": {
+            "type": "string"
+          },
+          "monthlyResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonthlyResultSummaryResponse"
+            }
           }
         }
       },
@@ -1944,7 +2398,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["OPEN", "MENU_PROPOSED", "COMPLETED"]
+            "enum": [
+              "OPEN",
+              "MENU_PROPOSED",
+              "COMPLETED"
+            ]
           },
           "left": {
             "type": "boolean"
@@ -1955,7 +2413,7 @@
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "description": "POST /api/v1/auth/login \uc751\ub2f5\uc758 token \uac12\ub9cc \uc785\ub825\ud569\ub2c8\ub2e4.",
+        "description": "POST /api/v1/auth/login 응답의 token 값만 입력합니다.",
         "name": "bearerAuth",
         "scheme": "bearer",
         "bearerFormat": "opaque-token"

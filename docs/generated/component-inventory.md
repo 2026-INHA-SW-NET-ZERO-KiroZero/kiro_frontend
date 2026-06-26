@@ -1,7 +1,7 @@
 # 컴포넌트 인벤토리 (자동 생성)
 
 > 자동 생성 파일 — 직접 수정 금지. `/gc`·`/health`·kiro-build가 코드를 스캔해 갱신한다.
-> 네비게이션 골격(issue #2) 이후 화면 구현 진행 중. 홈(`features/home`)은 placeholder에서 실제 화면으로 교체됨(issue #9). 나머지 탭/스택은 아직 placeholder.
+> 홈(`features/home`)·알림(`features/notifications`)은 실제 화면으로 구현됨(issue #9, #15). 나머지 탭/스택은 아직 placeholder.
 
 ## 공용 컴포넌트 (`src/components/`)
 
@@ -27,13 +27,22 @@
 
 ## 화면 컴포넌트 (`src/features/`)
 
-| 컴포넌트      | 경로                                  | 분류          | props 수 | 사용처                 |
-| ------------- | ------------------------------------- | ------------- | -------- | ---------------------- |
-| HomeScreen    | `src/features/home/HomeScreen.tsx`    | 혼합형(훅+UI) | 0        | `(tabs)/home` 라우트   |
-| LocationSheet | `src/features/home/LocationSheet.tsx` | 프레젠테이션  | 4        | HomeScreen (지역 필터) |
+| 컴포넌트            | 경로                                                 | 분류          | props 수 | 사용처                    |
+| ------------------- | ---------------------------------------------------- | ------------- | -------- | ------------------------- |
+| HomeScreen          | `src/features/home/HomeScreen.tsx`                   | 혼합형(훅+UI) | 0        | `(tabs)/home` 라우트      |
+| LocationSheet       | `src/features/home/LocationSheet.tsx`                | 프레젠테이션  | 4        | HomeScreen (지역 필터)    |
+| NotifDropdown       | `src/features/notifications/NotifDropdown.tsx`       | 오버레이      | 3        | HomeScreen (탑바 벨 토글) |
+| NotificationsScreen | `src/features/notifications/NotificationsScreen.tsx` | 혼합형(훅+UI) | 0        | `notifications` 라우트    |
 
-> HomeScreen은 `useHomeRooms()`(추천/열린 방 카드)·`useMe()`(추천 헤더)·`useNotifications()`(알림 dot) 훅으로만 데이터에 접근한다(PRD §3.3 · §3.16).
-> LocationSheet props: `visible` · `selected` · `onSelect` · `onClose`. 표시/선택 상태는 HomeScreen이 소유한다(프레젠테이션).
+> HomeScreen: `useNotifications()`의 `unreadCount`로 미읽음 dot 표시, 벨 탭 시 NotifDropdown 토글.
+> NotifDropdown props: `visible` · `onClose` · `onOpenPage`. 최대 5행, popIn 200ms 애니메이션.
+> NotificationsScreen: 전체 알림 목록, "모두 읽음" 버튼, 타입별 라우팅(eval→pastEval, 그 외→myApplication).
+
+## 상태 스토어 (`src/stores/`)
+
+| 스토어     | 경로                       | 상태/액션                                                        |
+| ---------- | -------------------------- | ---------------------------------------------------------------- |
+| notifStore | `src/stores/notifStore.ts` | `notifRead: Record<string,boolean>` · `markRead` · `markAllRead` |
 
 ## 라우트 (`src/app/` — Expo Router)
 
