@@ -62,6 +62,18 @@ export const color = {
   white: '#FFFFFF',
   bezel: '#16110D', // phone frame / home indicator
 
+  // ---- On-brand (빨강 그라데이션 hero 위 텍스트/표면) ----
+  onBrand: '#FFD9D0', // hero 라벨·소진율 캡션 (예: '음식물 절감', '소진율')
+  onBrandDim: '#FFCFC4', // hero 부가 설명 텍스트
+  onBrandTrack: 'rgba(255,255,255,0.28)', // 소진율 링 트랙(미채움)
+  onBrandPill: 'rgba(255,255,255,0.18)', // hero 내 '리포트 보기' pill 배경
+
+  // ---- MY / editProfile 보조 ----
+  neutralBtnBg: '#F2ECE4', // 중성 버튼 배경('프로필 수정')
+  chipReadBg: '#F6F1EB', // 읽기 전용 알레르기 칩 배경(MY)
+  listInk: '#2E2823', // 활동 리스트 항목 텍스트
+  appBgFade: 'rgba(251,247,243,0)', // sticky 버튼 상단 페이드(appBg 투명)
+
   // ---- State ----
   disabledBg: '#EFEAE4', // 비활성 버튼 배경
   disabledText: '#B8AFA4', // 비활성 버튼 텍스트
