@@ -11,6 +11,6 @@ export { menuCandidates, voteMenus, decidedMenu } from './menus';
 export { notifData } from './notifications';
 export { myApplications } from './applications';
 export { settlementData } from './settlement';
-export { pastMeetings } from './pastMeetings';
+export { pastMeetings, pastEvaluatedSeed } from './pastMeetings';
 export { partyPool } from './party';
 export { reportMonths } from './report';

@@ -19,3 +19,4 @@ export { useReport } from './useReport';
 export type { ReportBar, ReportView, UseReportResult } from './useReport';
 export { useAuth, AuthContext } from './useAuth';
 export { useProfile, ProfileContext, useProfileProvider } from './useProfile';
+export { usePastEval, PastEvalContext, usePastEvalProvider } from './usePastEval';

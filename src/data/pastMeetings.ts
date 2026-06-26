@@ -9,6 +9,12 @@
 import { color } from '@/theme/theme';
 import type { PastMeeting } from '@/types';
 
+/**
+ * 사전 평가 완료 시드 — `past2`는 이미 평가됨(평가 완료 분기 확인용).
+ * (출처: KiroZero.dc.html state `pastEvaluated:{past2:true}`)
+ */
+export const pastEvaluatedSeed: Record<string, boolean> = { past2: true };
+
 export const pastMeetings: PastMeeting[] = [
   {
     id: 'past1',
