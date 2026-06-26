@@ -12,6 +12,8 @@ export {
 } from './validators';
 export type { EmailValidity, EmailFeedback } from './validators';
 export { formatWon } from './format';
+export { splitBrought, myBroughtNames, refundBreakdown, derivePastEval } from './derive';
+export type { UsageRow, RefundBreakdown, PastEvalResult } from './derive';
 export { roomDisplay } from './roomDisplay';
 export { tokenStorage } from './tokenStorage';
 export type {

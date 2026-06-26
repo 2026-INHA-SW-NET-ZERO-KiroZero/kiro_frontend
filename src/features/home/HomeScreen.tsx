@@ -18,6 +18,8 @@ import { useHomeRooms, useNotifications } from '@/hooks';
 import type { HomeRoomCard } from '@/hooks';
 import { calendarTile, color, font, radius, shadow, space } from '@/theme/theme';
 
+import { NotifDropdown } from '@/features/notifications/NotifDropdown';
+
 import { LocationSheet, type LocationName } from './LocationSheet';
 
 /** 날짜 스트립 7타일 (dc.html line 156~178). */
@@ -42,9 +44,10 @@ const DAY_COLOR: Record<DayVariant, { num: string; weekday: string }> = {
 export function HomeScreen() {
   const router = useRouter();
   const { openRooms } = useHomeRooms();
-  const { data: notifs } = useNotifications();
-  const hasUnread = notifs.some((n) => n.unread);
+  const { unreadCount } = useNotifications();
+  const hasUnread = unreadCount > 0;
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [location, setLocation] = useState<LocationName>('내 지역');
 
@@ -62,11 +65,7 @@ export function HomeScreen() {
             <Text style={styles.campusPillText}>🌱 인하대</Text>
           </View>
         </View>
-        <Pressable
-          onPress={() => router.push('/notifications')}
-          hitSlop={8}
-          style={styles.notifBtn}
-        >
+        <Pressable onPress={() => setDropdownOpen(true)} hitSlop={8} style={styles.notifBtn}>
           <Icon name="notifications" size={25} color={color.ink} />
           {hasUnread ? <View style={styles.notifDot} /> : null}
         </Pressable>
@@ -114,6 +113,15 @@ export function HomeScreen() {
           ))}
         </View>
       </ScrollView>
+
+      <NotifDropdown
+        visible={dropdownOpen}
+        onClose={() => setDropdownOpen(false)}
+        onOpenPage={() => {
+          setDropdownOpen(false);
+          router.push('/notifications');
+        }}
+      />
 
       <LocationSheet
         visible={locationOpen}
