@@ -11,7 +11,7 @@ import type { AsyncResult } from './useApiData';
 
 function toMe(res: CurrentUserResponse): Me {
   return {
-    name: res.nickname,
+    nickname: res.nickname,
     email: res.email,
     skill: SKILL_TO_LABEL[res.cookingSkill],
     allergy: res.allergyTags,

@@ -8,7 +8,7 @@ export type SkillLevel = '상' | '중' | '하';
  * `name←nickname`, `skill←cookingSkill`, `allergy←allergyTags`(tag 문자열), `leaves←cash`(누적 환불 적립금, 프론트 표기 "나뭇잎").
  */
 export interface Me {
-  name: string;
+  nickname: string;
   email: string;
   /** 요리 숙련도 (상/중/하). */
   skill: SkillLevel;

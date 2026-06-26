@@ -35,19 +35,16 @@ export default function MyScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>MY</Text>
-        <View style={styles.headerIcons}>
-          <Icon name="search" size={25} color={color.ink} />
-          <Pressable onPress={() => router.push('/notifications')} hitSlop={8}>
-            <Icon name="notifications" size={25} color={color.ink} />
-          </Pressable>
-        </View>
+        <Pressable onPress={() => router.push('/notifications')} hitSlop={8}>
+          <Icon name="notifications" size={25} color={color.ink} />
+        </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* 프로필 행 */}
         <View style={styles.profileRow}>
           <View style={styles.profileText}>
-            <Text style={styles.name}>{me.name}</Text>
+            <Text style={styles.name}>{me.nickname}</Text>
           </View>
           <Pressable onPress={() => router.push('/editProfile')} hitSlop={6} style={styles.editBtn}>
             <Text style={styles.editBtnText}>프로필 수정</Text>
@@ -151,7 +148,6 @@ const styles = StyleSheet.create({
     color: color.ink,
     letterSpacing: font.tracking.tightH,
   },
-  headerIcons: { flexDirection: 'row', alignItems: 'center', gap: space.x5 },
   scroll: { paddingHorizontal: space.screenX, paddingBottom: space.x10 },
 
   profileRow: {
@@ -163,7 +159,7 @@ const styles = StyleSheet.create({
   },
   profileText: { flex: 1, minWidth: 0 },
   name: {
-    fontSize: font.size.h1,
+    fontSize: font.size.h3,
     fontFamily: font.family.bold,
     color: color.ink,
     letterSpacing: font.tracking.tightH,

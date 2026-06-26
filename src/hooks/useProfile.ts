@@ -66,7 +66,7 @@ export function useProfileProvider(): ProfileState {
     setSaving(true);
     try {
       const body: UpdateProfileRequest = {
-        nickname: me.name,
+        nickname: me.nickname,
         cookingSkill: SKILL_TO_SERVER[skillLevel],
         allergyTags: allergies,
       };
