@@ -8,7 +8,15 @@ module.exports = defineConfig([
   expoConfig,
   eslintPluginPrettierRecommended,
   {
-    ignores: ['dist/*', 'node_modules/*', '.expo/*', 'design/*', 'docs/*', 'coverage/*'],
+    ignores: [
+      'dist/*',
+      'node_modules/*',
+      '.expo/*',
+      'expo-env.d.ts', // expo-router 자동 생성(gitignore)
+      'design/*',
+      'docs/*',
+      'coverage/*',
+    ],
   },
   {
     // ---- KiroZero 프로젝트 규칙 (교정 지시 포함) ----
