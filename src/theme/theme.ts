@@ -35,8 +35,6 @@ export const color = {
   blue: '#3B7DE0', // Saturday / calendar
   blueAlt: '#4A7DE0',
   purple: '#7C6FF0', // "나"(me) marker, role dots
-  indigo: '#5B5BD6', // admin theme
-  indigoEnd: '#7A6FF0', // admin gradient end
   gold: '#C0801E', // 중급 skill, purchase, amber text
   goldSoft: '#E59A2E',
   amberBgSoft: '#FFF3E0', // amber/cream chip bg
@@ -81,10 +79,8 @@ export const color = {
 export const gradient = {
   brand: ['#FF443D', '#E12E27'], // settlement hero (120deg)
   brandWarm: ['#FF443D', '#FF7A52'], // MY card / report hero (120deg)
-  admin: ['#5B5BD6', '#7A6FF0'], // admin KPI hero (120deg)
   cream: ['#FFF3E0', '#FDEEE8'], // chosen-menu / decided-menu cards (105–110deg)
   creamBd: '#F6DFC9', // border that pairs with `cream`
-  warmChip: ['#FFF3E0', '#FDEEE8'], // fridge "임박" banner (100deg)
 } as const;
 
 /** Type scale (px). RN: pass fontSize as number; weight as string. Font = Pretendard. */
@@ -179,7 +175,7 @@ export const shadow = {
     shadowRadius: 16,
     elevation: 8,
   },
-  // 0 16px 30px -16px rgba(...) — hero gradient cards (settlement/report/admin/carbon)
+  // 0 16px 30px -16px rgba(...) — hero gradient cards (settlement/report/carbon)
   hero: {
     shadowColor: '#321E0C',
     shadowOffset: { width: 0, height: 14 },
@@ -197,7 +193,7 @@ export const shadow = {
   },
 } as const;
 
-/** Status → chip color map (badges across home/admin/room cards). */
+/** Status → chip color map (badges across home/room cards). */
 export const statusChip = {
   open: { fg: '#1F8676', bg: color.ecoBgSoft, label: '모집중' },
   seatsLeft: { fg: '#D6342D', bg: color.redBgSoft }, // "N자리 남음"
