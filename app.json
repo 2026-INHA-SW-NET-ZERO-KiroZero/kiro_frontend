@@ -23,11 +23,11 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "owner": "l2juhan",
     "extra": {
       "eas": {
-        "projectId": "256f88a5-66b7-492f-8429-17c4514ac8f4"
+        "projectId": "4f7c93f4-5534-4ae8-98fb-d4bfb4a47519"
       }
-    },
-    "owner": "teampaycheck"
+    }
   }
 }
