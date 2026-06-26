@@ -9,6 +9,7 @@ export default function HomeScreen() {
         { href: '/roomDetail', label: '방 상세' },
         { href: '/recommend', label: 'AI 추천' },
         { href: '/notifications', label: '알림' },
+        { href: '/components-demo', label: '컴포넌트 데모' },
       ]}
     />
   );
