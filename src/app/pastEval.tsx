@@ -1,3 +1,4 @@
+import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -15,36 +16,101 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
 import { usePastEval, usePastMeeting } from '@/hooks';
-import { myBroughtNames } from '@/lib';
+import { tokenStorage } from '@/lib';
 import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
+import type { ImageUploadResponse } from '@/types';
 
-const COOK_HERO = require('../../assets/cook-hero.png');
+type UploadPurpose = 'COOKED_PHOTO' | 'AFTER_PHOTO';
+
+/** 라이브러리에서 사진을 골라 업로드하고 `fileUrl`을 반환한다(취소·권한거부 시 null). */
+async function pickAndUploadPhoto(purpose: UploadPurpose): Promise<string | null> {
+  const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!perm.granted) return null;
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],
+    quality: 0.8,
+  });
+  if (result.canceled) return null;
+
+  const asset = result.assets[0];
+  // RN 환경에서 파일 uri → Blob으로 읽어 multipart 전송(임의 캐스팅 없이 타입 안전).
+  const fileResp = await fetch(asset.uri);
+  const blob = await fileResp.blob();
+
+  const formData = new FormData();
+  formData.append('file', blob, 'photo.jpg');
+
+  const token = await tokenStorage.get();
+  const base = process.env.EXPO_PUBLIC_API_BASE_URL ?? '';
+  const res = await fetch(`${base}/api/v1/uploads?purpose=${purpose}`, {
+    method: 'POST',
+    headers: token !== null ? { Authorization: `Bearer ${token}` } : undefined,
+    body: formData,
+  });
+  if (!res.ok) throw new Error('사진 업로드에 실패했어요.');
+
+  const data: ImageUploadResponse = await res.json();
+  return data.fileUrl;
+}
+
 const EVAL_OPTS = [0, 25, 50, 75, 100] as const;
 
 /** 모임 평가 (PRD §3.11). 인증 사진 2장 + 음식 소비율 + 재료별 소진율 → 평가 완료. */
 export default function PastEvalScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const pastId = id ?? 'past1';
-  const { data: past } = usePastMeeting(pastId);
-  const { markEvaluated } = usePastEval();
+  const pastId = id ?? '';
+  const { data: past, myIngredients } = usePastMeeting(pastId);
+  const { markEvaluated, submitting, submitError } = usePastEval();
 
-  const [photoDone, setPhotoDone] = useState(false);
-  const [photoLeft, setPhotoLeft] = useState(false);
+  const [cookedPhotoUrl, setCookedPhotoUrl] = useState<string | null>(null);
+  const [afterPhotoUrl, setAfterPhotoUrl] = useState<string | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [food, setFood] = useState<number | null>(null);
-  const [ing, setIng] = useState<Record<string, number>>({});
+  const [ing, setIng] = useState<Record<number, number>>({});
 
   if (!past) {
     return <SafeAreaView style={styles.safe} edges={['top']} />;
   }
 
-  const broughtNames = myBroughtNames(past);
   const canSubmit =
-    photoDone && photoLeft && food !== null && broughtNames.every((n) => ing[n] != null);
+    cookedPhotoUrl !== null &&
+    afterPhotoUrl !== null &&
+    food !== null &&
+    myIngredients.every((item) => ing[item.sessionIngredientId] != null);
 
-  const submit = () => {
-    if (!canSubmit) return;
-    markEvaluated(past.id);
-    router.back();
+  const pickPhoto = async (purpose: UploadPurpose) => {
+    if (photoUploading) return;
+    setPhotoUploading(true);
+    try {
+      const url = await pickAndUploadPhoto(purpose);
+      if (url !== null) {
+        if (purpose === 'COOKED_PHOTO') setCookedPhotoUrl(url);
+        else setAfterPhotoUrl(url);
+      }
+    } catch {
+      // 업로드 실패는 무시하고 사용자가 다시 시도하도록 둔다.
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
+  const submit = async () => {
+    if (cookedPhotoUrl === null || afterPhotoUrl === null || food === null || submitting) return;
+    try {
+      await markEvaluated(Number(pastId), {
+        finishedFoodRate: food,
+        cookedPhotoUrl,
+        afterPhotoUrl,
+        items: myIngredients.map((item) => ({
+          sessionIngredientId: item.sessionIngredientId,
+          useRate: ing[item.sessionIngredientId],
+        })),
+      });
+      router.back();
+    } catch {
+      // submitError가 컨텍스트 상태로 노출된다.
+    }
   };
 
   return (
@@ -75,15 +141,17 @@ export default function PastEvalScreen() {
 
         <Text style={styles.photoLabel}>① 완성한 음식</Text>
         <PhotoTile
-          filled={photoDone}
-          onPress={() => setPhotoDone(true)}
+          uri={cookedPhotoUrl}
+          uploading={photoUploading}
+          onPress={() => pickPhoto('COOKED_PHOTO')}
           placeholder="완성한 음식 사진을 올려주세요"
         />
 
         <Text style={styles.photoLabel}>② 다 먹은 뒤 · 남은 음식</Text>
         <PhotoTile
-          filled={photoLeft}
-          onPress={() => setPhotoLeft(true)}
+          uri={afterPhotoUrl}
+          uploading={photoUploading}
+          onPress={() => pickPhoto('AFTER_PHOTO')}
           placeholder="남은 음식 사진을 올려주세요"
           hint="증명용으로 사용돼요"
           dim
@@ -104,26 +172,28 @@ export default function PastEvalScreen() {
         </View>
         <Text style={styles.fieldSub}>재료별로 실제 사용한 비율을 골라주세요</Text>
         <View style={styles.ingRows}>
-          {broughtNames.map((name) => (
-            <View key={name}>
-              <Text style={styles.ingName}>{name}</Text>
+          {myIngredients.map((item) => (
+            <View key={item.sessionIngredientId}>
+              <Text style={styles.ingName}>{item.nameKo}</Text>
               <PctSegment
-                value={ing[name] ?? null}
-                onChange={(v) => setIng((prev) => ({ ...prev, [name]: v }))}
+                value={ing[item.sessionIngredientId] ?? null}
+                onChange={(v) => setIng((prev) => ({ ...prev, [item.sessionIngredientId]: v }))}
               />
             </View>
           ))}
         </View>
 
+        {submitError !== null ? <Text style={styles.submitError}>{submitError}</Text> : null}
+
         <Pressable
           onPress={submit}
-          disabled={!canSubmit}
+          disabled={!canSubmit || submitting}
           style={[styles.submit, canSubmit ? styles.submitActive : styles.submitIdle]}
         >
           <Text
             style={[styles.submitText, canSubmit ? styles.submitTextActive : styles.submitTextIdle]}
           >
-            평가 완료
+            {submitting ? '제출 중…' : '평가 완료'}
           </Text>
         </Pressable>
       </ScrollView>
@@ -132,19 +202,20 @@ export default function PastEvalScreen() {
 }
 
 type PhotoTileProps = {
-  filled: boolean;
+  uri: string | null;
+  uploading: boolean;
   onPress: () => void;
   placeholder: string;
   hint?: string;
   dim?: boolean;
 };
 
-function PhotoTile({ filled, onPress, placeholder, hint, dim }: PhotoTileProps) {
-  if (filled) {
+function PhotoTile({ uri, uploading, onPress, placeholder, hint, dim }: PhotoTileProps) {
+  if (uri !== null) {
     return (
-      <Pressable onPress={onPress} style={styles.photoFilled}>
+      <Pressable onPress={onPress} disabled={uploading} style={styles.photoFilled}>
         <Image
-          source={COOK_HERO}
+          source={{ uri }}
           style={[styles.photoImg, dim && styles.photoImgDim]}
           resizeMode="cover"
         />
@@ -161,11 +232,11 @@ function PhotoTile({ filled, onPress, placeholder, hint, dim }: PhotoTileProps) 
     );
   }
   return (
-    <Pressable onPress={onPress} style={styles.photoDashed}>
+    <Pressable onPress={onPress} disabled={uploading} style={styles.photoDashed}>
       <View style={styles.photoDashedIcon}>
         <Icon name="add-a-photo" size={28} color={color.uploadIcon} />
       </View>
-      <Text style={styles.photoDashedText}>{placeholder}</Text>
+      <Text style={styles.photoDashedText}>{uploading ? '업로드 중…' : placeholder}</Text>
       {hint ? <Text style={styles.photoDashedHint}>{hint}</Text> : null}
     </Pressable>
   );
@@ -370,6 +441,14 @@ const styles = StyleSheet.create({
     marginBottom: space.sm + 3,
   },
 
+  submitError: {
+    fontSize: font.size.cap,
+    fontFamily: font.family.semibold,
+    color: color.brand,
+    letterSpacing: font.tracking.snug,
+    marginBottom: space.x3,
+    textAlign: 'center',
+  },
   submit: { borderRadius: radius.x3, paddingVertical: space.x6, alignItems: 'center' },
   submitActive: { backgroundColor: color.brand, ...shadow.brandBtn },
   submitIdle: { backgroundColor: color.disabledBg },
