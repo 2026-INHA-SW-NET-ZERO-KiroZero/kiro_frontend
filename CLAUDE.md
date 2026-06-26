@@ -41,6 +41,7 @@
 
 - **모든 작업은 GitHub 이슈 기반.** 작업 시작: "issue #번호 작업하자". 이슈 생성: "이슈 만들어줘"(`.github/ISSUE_TEMPLATE/` 따름).
 - 브랜치: **main 단일**. 작업은 새 브랜치 → PR(base `main`) → Squash 머지. 커밋: Conventional Commits.
+- **PR 생성 시 exec-plan 정리(항상)**: PR을 만들 때 그 PR이 닫는 이슈의 `docs/exec-plans/{YYYY-MM-DD}-issue-{번호}.md`를 `git rm`으로 삭제 커밋에 포함한다. exec-plan은 작업 중 산출물이라 머지되면 main에 남기지 않는다(작업 중엔 유지, PR 직전에만 삭제).
 - **구현 완료 시 항상**: harness 통과 후 묻지 말고 **새 브랜치 생성 + 커밋**까지 진행하고(이미 main이면 브랜치 먼저), 사용자에게 **작업이 끝났다고 보고**한다(변경 파일·요약 포함). 실기기 테스트 편의를 위함. **PR 생성은 사용자가 따로 요청할 때만.**
 - **재빌드 필요 시 항상**: 작업으로 **네이티브 의존성이 바뀌면**(`npx expo install`로 native 모듈 추가/삭제, app.json plugins·네이티브 설정 변경 등 — JS-only 변경은 OTA로 충분하므로 불필요) 커밋 후 `eas build --profile development --platform ios`를 트리거하고 사용자에게 보고한다. 사용자가 직접 빌드 완료를 확인하고 테스트한다. 단 **credentials 미설정·Apple 인터랙티브 인증이 필요한 최초 빌드**는 비대화형으로 불가하므로 사용자에게 직접 실행을 요청한다.
 

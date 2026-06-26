@@ -35,6 +35,8 @@ export const color = {
   blue: '#3B7DE0', // Saturday / calendar
   blueAlt: '#4A7DE0',
   purple: '#7C6FF0', // "나"(me) marker, role dots
+  pink: '#E5689E', // participant avatar identity color
+  leaf: '#6BA84F', // participant avatar identity color
   gold: '#C0801E', // 중급 skill, purchase, amber text
   goldSoft: '#E59A2E',
   amberBgSoft: '#FFF3E0', // amber/cream chip bg
@@ -82,6 +84,21 @@ export const gradient = {
   cream: ['#FFF3E0', '#FDEEE8'], // chosen-menu / decided-menu cards (105–110deg)
   creamBd: '#F6DFC9', // border that pairs with `cream`
 } as const;
+
+/**
+ * 참여자 아바타 식별 색 팔레트 — 디자인 원본(KiroZero.dc.html `colors[]`)의 8색.
+ * 더미데이터 시드(`src/data/`)가 참여자별 색을 이 팔레트에서 가져온다.
+ */
+export const avatarPalette = [
+  color.brand, // #FF443D
+  color.eco, // #2F9E8B
+  color.goldSoft, // #E59A2E
+  color.blueAlt, // #4A7DE0
+  color.pink, // #E5689E
+  color.purple, // #7C6FF0
+  color.leaf, // #6BA84F
+  color.gold, // #C0801E
+] as const;
 
 /** Type scale (px). RN: pass fontSize as number. Font = Pretendard. */
 export const font = {
