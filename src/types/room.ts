@@ -26,6 +26,8 @@ export interface Room {
   parts: RoomParticipant[];
   /** 카드 미리보기 재료 이모지. */
   prev: string[];
+  /** 현재 사용자가 이미 참여 중인지 여부 (API SlotDetailResponse.joined 매핑). */
+  joined?: boolean;
 }
 
 /** 통합 식재료 행 (방 상세 통합 식재료 · 사용량 기록). */

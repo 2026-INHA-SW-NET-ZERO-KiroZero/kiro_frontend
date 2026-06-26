@@ -13,7 +13,17 @@ export type {
 } from './auth';
 export { SKILL_TO_SERVER, SKILL_TO_LABEL } from './auth';
 export type { RoomParticipant, Room, AggIngredient, PartyBring, PartyProfile } from './room';
-export type { AllergenTag, Ingredient } from './ingredient';
+export type { Ingredient, IngredientItemResponse, IngredientSearchResponse } from './ingredient';
+export type {
+  SlotListItemResponse,
+  SlotListResponse,
+  SlotDetailParticipantResponse,
+  SlotDetailResponse,
+  JoinIngredientRequest,
+  JoinSlotRequest,
+  JoinSlotResponse,
+  LeaveSlotResponse,
+} from './slot';
 export type {
   IngredientNeed,
   Purchase,

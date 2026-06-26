@@ -16,6 +16,8 @@ export { splitBrought, myBroughtNames, refundBreakdown, derivePastEval } from '.
 export type { UsageRow, RefundBreakdown, PastEvalResult } from './derive';
 export { roomDisplay } from './roomDisplay';
 export { tokenStorage } from './tokenStorage';
+export { listSlots, getSlotDetail, joinSlot, leaveSlot } from './slotApi';
+export { searchIngredients } from './ingredientApi';
 export type {
   RoomState,
   StatusBadgeKey,
