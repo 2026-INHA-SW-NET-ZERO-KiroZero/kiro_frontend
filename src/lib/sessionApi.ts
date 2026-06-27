@@ -36,51 +36,19 @@ export function updateSessionIngredients(
 
 /** 메뉴 추천 요청. `POST /api/v1/sessions/{slotId}/recommendations` */
 export function requestRecommendation(slotId: number): Promise<RecommendationResponse> {
-  console.log('[requestRecommendation] REQUEST', { slotId });
   return apiRequest<RecommendationResponse>(`/sessions/${slotId}/recommendations`, {
     method: 'POST',
-  }).then(
-    (res) => {
-      console.log('[requestRecommendation] RESPONSE', res);
-      return res;
-    },
-    (err: unknown) => {
-      console.error('[requestRecommendation] ERROR', err);
-      throw err;
-    },
-  );
+  });
 }
 
 /** 최신 추천 + 선택 메뉴. `GET /api/v1/sessions/{slotId}/recommendations/latest` */
 export function getLatestRecommendation(slotId: number): Promise<LatestRecommendationResponse> {
-  console.log('[getLatestRecommendation] REQUEST', { slotId });
-  return apiRequest<LatestRecommendationResponse>(
-    `/sessions/${slotId}/recommendations/latest`,
-  ).then(
-    (res) => {
-      console.log('[getLatestRecommendation] RESPONSE', res);
-      return res;
-    },
-    (err: unknown) => {
-      console.error('[getLatestRecommendation] ERROR', err);
-      throw err;
-    },
-  );
+  return apiRequest<LatestRecommendationResponse>(`/sessions/${slotId}/recommendations/latest`);
 }
 
 /** 메뉴 투표. `POST /api/v1/sessions/{slotId}/votes` */
 export function submitVoteApi(slotId: number, body: MenuVoteRequest): Promise<MenuVoteResponse> {
-  console.log('[submitVote] REQUEST', { slotId, body });
-  return apiRequest<MenuVoteResponse>(`/sessions/${slotId}/votes`, { method: 'POST', body }).then(
-    (res) => {
-      console.log('[submitVote] RESPONSE', res);
-      return res;
-    },
-    (err: unknown) => {
-      console.error('[submitVote] ERROR', err);
-      throw err;
-    },
-  );
+  return apiRequest<MenuVoteResponse>(`/sessions/${slotId}/votes`, { method: 'POST', body });
 }
 
 /** 내 모임/신청 세션 목록. `GET /api/v1/me/sessions` */

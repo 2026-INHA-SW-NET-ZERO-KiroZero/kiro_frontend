@@ -23,24 +23,12 @@ export function getSlotDetail(slotId: number): Promise<SlotDetailResponse> {
   return apiRequest<SlotDetailResponse>(`/slots/${slotId}`);
 }
 
-/** 방 참여(재료 등록). `POST /api/v1/slots/{slotId}/join` */
+/** 방 참여(재료 등록). `POST /api/v1/slots/${slotId}/join` */
 export function joinSlot(slotId: number, body: JoinSlotRequest): Promise<JoinSlotResponse> {
   return apiRequest<JoinSlotResponse>(`/slots/${slotId}/join`, { method: 'POST', body });
 }
 
 /** 방 나가기. `DELETE /api/v1/slots/{slotId}/join` */
 export function leaveSlot(slotId: number): Promise<LeaveSlotResponse> {
-  console.log('[leaveSlot] REQUEST', { slotId });
-  return apiRequest<LeaveSlotResponse>(`/slots/${slotId}/join`, { method: 'DELETE' }).then(
-    (res) => {
-      console.log('[leaveSlot] RESPONSE', res);
-      return res;
-    },
-    (err: unknown) => {
-      const status =
-        err instanceof Error && 'status' in err ? (err as { status: number }).status : '?';
-      console.error('[leaveSlot] ERROR', { status, err });
-      throw err;
-    },
-  );
+  return apiRequest<LeaveSlotResponse>(`/slots/${slotId}/join`, { method: 'DELETE' });
 }
