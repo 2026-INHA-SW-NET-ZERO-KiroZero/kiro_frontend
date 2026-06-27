@@ -7,6 +7,8 @@ import type {
   LatestRecommendationResponse,
   MenuVoteRequest,
   MenuVoteResponse,
+  MySessionDetailResponse,
+  MySessionListResponse,
   RecommendationResponse,
   SessionStatusResponse,
   UpdateSessionIngredientsRequest,
@@ -68,4 +70,22 @@ export function submitVoteApi(slotId: number, body: MenuVoteRequest): Promise<Me
       return res;
     },
   );
+}
+
+/** 내 모임/신청 세션 목록. `GET /api/v1/me/sessions` */
+export function listMySessions(): Promise<MySessionListResponse> {
+  console.warn('GET /api/v1/me/sessions request');
+  return apiRequest<MySessionListResponse>('/me/sessions').then((res) => {
+    console.warn('GET /api/v1/me/sessions response:', res);
+    return res;
+  });
+}
+
+/** 내 모임 세션 상세. `GET /api/v1/me/sessions/{slotId}` */
+export function getMySessionDetail(slotId: number): Promise<MySessionDetailResponse> {
+  console.warn(`GET /api/v1/me/sessions/${slotId} request:`, { slotId });
+  return apiRequest<MySessionDetailResponse>(`/me/sessions/${slotId}`).then((res) => {
+    console.warn(`GET /api/v1/me/sessions/${slotId} response:`, res);
+    return res;
+  });
 }

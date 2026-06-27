@@ -112,3 +112,52 @@ export interface MenuVoteResponse {
   selectedMenu: SelectedMenuSummaryResponse | null;
   nextStatus: SessionStatus;
 }
+
+// ── my-session-controller ──────────────────────────────────────────────────
+
+export interface SessionIngredientResponse {
+  sessionIngredientId: number;
+  ingredientId: number;
+  nameKo: string;
+  count: number;
+  knownGrams: number | null;
+  estimatedGrams: number | null;
+}
+
+export interface MySessionItemResponse {
+  slotId: number;
+  participantId: number;
+  date: string;
+  placeName: string;
+  stationCode: string;
+  startTime: string;
+  endTime: string;
+  timeLabel: string;
+  capacity: number;
+  participantCount: number;
+  status: SessionStatus;
+  canPurchase: boolean;
+  myIngredientCount: number;
+  hasRecommendation: boolean;
+  hasSelectedMenu: boolean;
+  completed: boolean;
+  selectedMenu: SelectedMenuSummaryResponse | null;
+}
+
+export interface MySessionListResponse {
+  sessions: MySessionItemResponse[];
+}
+
+export interface MySessionDetailResponse {
+  slotId: number;
+  myParticipantId: number;
+  joined: boolean;
+  canPurchase: boolean;
+  status: SessionStatus;
+  myIngredients: SessionIngredientResponse[];
+  session: SessionStatusResponse;
+  hasRecommendation: boolean;
+  hasSelectedMenu: boolean;
+  completed: boolean;
+  selectedMenu: SelectedMenuSummaryResponse | null;
+}

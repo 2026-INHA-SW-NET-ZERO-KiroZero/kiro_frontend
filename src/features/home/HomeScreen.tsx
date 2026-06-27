@@ -22,30 +22,40 @@ import { NotifDropdown } from '@/features/notifications/NotifDropdown';
 
 import { LocationSheet, type LocationName } from './LocationSheet';
 
-/** 날짜 스트립 7타일 (dc.html line 156~178). */
-type DayVariant = 'today' | 'sat' | 'sun' | 'weekday';
-const DATE_TILES: { day: string; weekday: string; variant: DayVariant }[] = [
-  { day: '26', weekday: '금', variant: 'today' },
-  { day: '27', weekday: '토', variant: 'sat' },
-  { day: '28', weekday: '일', variant: 'sun' },
-  { day: '29', weekday: '월', variant: 'weekday' },
-  { day: '30', weekday: '화', variant: 'weekday' },
-  { day: '1', weekday: '수', variant: 'weekday' },
-  { day: '2', weekday: '목', variant: 'weekday' },
-];
+type DayVariant = 'sat' | 'sun' | 'weekday';
 
 const DAY_COLOR: Record<DayVariant, { num: string; weekday: string }> = {
-  today: { num: calendarTile.todayNum, weekday: calendarTile.todayWeekday },
   sat: { num: calendarTile.satNum, weekday: calendarTile.satWeekday },
   sun: { num: calendarTile.sunNum, weekday: calendarTile.sunWeekday },
   weekday: { num: calendarTile.weekdayNum, weekday: calendarTile.weekdayWeekday },
 };
 
+const KO_DAYS = ['일', '월', '화', '수', '목', '금', '토'] as const;
+
+function todayISO(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function buildDateStrip(fromISO: string) {
+  const [y, m, d] = fromISO.split('-').map(Number);
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(y, m - 1, d + i);
+    const dow = date.getDay();
+    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const variant: DayVariant = dow === 6 ? 'sat' : dow === 0 ? 'sun' : 'weekday';
+    return { iso, day: String(date.getDate()), weekday: KO_DAYS[dow], variant };
+  });
+}
+
 export function HomeScreen() {
   const router = useRouter();
-  const { openRooms } = useHomeRooms();
+  const [selectedDate, setSelectedDate] = useState(todayISO);
+  const { openRooms } = useHomeRooms(selectedDate);
   const { unreadCount } = useNotifications();
   const hasUnread = unreadCount > 0;
+
+  const dateTiles = buildDateStrip(todayISO());
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
@@ -82,14 +92,21 @@ export function HomeScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.dateStrip}
         >
-          {DATE_TILES.map((tile) => {
-            const isToday = tile.variant === 'today';
-            const c = DAY_COLOR[tile.variant];
+          {dateTiles.map((tile) => {
+            const isSelected = tile.iso === selectedDate;
+            const c = isSelected
+              ? { num: calendarTile.todayNum, weekday: calendarTile.todayWeekday }
+              : DAY_COLOR[tile.variant];
             return (
-              <View key={tile.weekday} style={[styles.dateTile, isToday && styles.dateTileToday]}>
+              <Pressable
+                key={tile.iso}
+                style={[styles.dateTile, isSelected && styles.dateTileToday]}
+                onPress={() => setSelectedDate(tile.iso)}
+                hitSlop={4}
+              >
                 <Text style={[styles.dateNum, { color: c.num }]}>{tile.day}</Text>
                 <Text style={[styles.dateWeekday, { color: c.weekday }]}>{tile.weekday}</Text>
-              </View>
+              </Pressable>
             );
           })}
         </ScrollView>

@@ -231,9 +231,10 @@ function RecruitingStage({
       </Text>
       <Text style={styles.partsSub}>개인정보 보호를 위해 모든 참여자는 익명으로 표시돼요</Text>
       <View style={styles.partList}>
-        {Array.from({ length: count }, (_, idx) => (
-          <ParticipantCard key={idx} idx={idx} profile={partyPool[idx % partyPool.length]} />
-        ))}
+        {partyPool.length > 0 &&
+          Array.from({ length: count }, (_, idx) => (
+            <ParticipantCard key={idx} idx={idx} profile={partyPool[idx % partyPool.length]} />
+          ))}
       </View>
     </>
   );

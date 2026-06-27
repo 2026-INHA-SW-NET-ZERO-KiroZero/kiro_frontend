@@ -53,4 +53,8 @@ export type {
   SelectedMenuSummaryResponse,
   MenuVoteRequest,
   MenuVoteResponse,
+  SessionIngredientResponse,
+  MySessionItemResponse,
+  MySessionListResponse,
+  MySessionDetailResponse,
 } from './session';

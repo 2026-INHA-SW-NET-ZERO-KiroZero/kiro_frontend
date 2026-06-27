@@ -40,7 +40,7 @@ export default function RoomDetailScreen() {
 
   const { data: room } = useRoomDetail(id ?? '');
   const { data: partyPool } = usePartyPool(slotId);
-  const { data: aggList } = useAggIngredients();
+  const { data: aggList } = useAggIngredients(slotId);
   // 로컬 override가 없으면 API 응답 joined 값을 사용
   const joined = joinedOverride ?? room?.joined ?? false;
 
@@ -83,7 +83,7 @@ export default function RoomDetailScreen() {
         router.push(`/recommend?slotId=${slotId}`);
         break;
       case 'usage':
-        router.push('/usage');
+        router.push(`/usage?slotId=${slotId}`);
         break;
       case 'settlement':
         router.push('/settlement');
