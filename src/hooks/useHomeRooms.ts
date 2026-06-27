@@ -31,6 +31,7 @@ export interface HomeRoomCard {
   /** 표기용 날짜 (예: '06.26 (금)'). */
   dateShort: string;
   place: string;
+  stationCode?: string;
   /** 상태 배지 키 (theme `statusChip` 조회용). */
   badgeKey: StatusBadgeKey;
   /**
@@ -71,6 +72,7 @@ export function toHomeRoomCard(room: Room): HomeRoomCard {
     time: room.time,
     dateShort: room.date,
     place: room.place,
+    stationCode: room.stationCode,
     ...homeBadge(display.seatsLeft),
     tagText: room.tags.join(' · '),
     countText: display.seatsCount,

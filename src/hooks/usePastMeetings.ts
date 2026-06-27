@@ -19,7 +19,7 @@ import type {
   SessionResultResponse,
 } from '@/types';
 
-import { useApiData } from './useApiData';
+import { type AsyncResult, useApiData } from './useApiData';
 
 /** 단건 결과 + 평가 제출에 필요한 내 재료(`sessionIngredientId` 조달용). */
 export interface PastMeetingResult extends DataResult<PastMeeting | null> {
@@ -27,7 +27,7 @@ export interface PastMeetingResult extends DataResult<PastMeeting | null> {
 }
 
 /** 지난 모임 목록 — 결과값(절감량 등)은 placeholder, 단건 진입 시 채워진다. */
-export function usePastMeetings(): DataResult<PastMeeting[]> {
+export function usePastMeetings(): AsyncResult<PastMeeting[]> {
   const fetcher = useCallback(async (): Promise<PastMeeting[]> => {
     const res = await apiRequest<MySessionListResponse>('/me/sessions');
     return res.sessions

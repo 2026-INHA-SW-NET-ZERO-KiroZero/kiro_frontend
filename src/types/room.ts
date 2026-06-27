@@ -17,6 +17,7 @@ export interface Room {
   /** 시작 시각 (예: '16:00' | '18:00'). */
   time: string;
   place: string;
+  stationCode?: string;
   /** 태그 목록 (예: ['저녁','조리실습실']). */
   tags: string[];
   capacity: number;

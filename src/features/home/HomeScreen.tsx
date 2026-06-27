@@ -169,6 +169,7 @@ function OpenCard({ room, onPress }: { room: HomeRoomCard; onPress: () => void }
       <View style={styles.placeRow}>
         <Icon name="location-on" size={18} color={color.textMute} />
         <Text style={styles.openPlace}>{room.place}</Text>
+        {room.stationCode != null && <Text style={styles.openStation}>{room.stationCode}</Text>}
       </View>
       <View style={styles.openFooter}>
         <AvatarStack participants={room.parts.map((p) => ({ name: p.label, color: p.bg }))} />
@@ -339,6 +340,12 @@ const styles = StyleSheet.create({
     fontSize: font.size.smx,
     fontFamily: font.family.medium,
     color: color.textMute,
+    letterSpacing: font.tracking.snug,
+  },
+  openStation: {
+    fontSize: font.size.smx,
+    fontFamily: font.family.medium,
+    color: color.textFaint,
     letterSpacing: font.tracking.snug,
   },
   openFooter: {

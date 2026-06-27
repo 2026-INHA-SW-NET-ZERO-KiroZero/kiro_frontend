@@ -10,15 +10,19 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Icon } from '@/components';
-import { useMenuCandidates } from '@/hooks/useMenus';
+import { useRecommendation } from '@/hooks/useMenus';
 import type { MenuCandidate } from '@/types';
 import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
 export default function RecommendScreen() {
   const router = useRouter();
   const { slotId } = useLocalSearchParams<{ slotId?: string }>();
-  const { data: candidates } = useMenuCandidates(Number(slotId ?? '0'));
+  const { status, candidates, loading, generate, generating } = useRecommendation(
+    Number(slotId ?? '0'),
+  );
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
+
+  const showGenerateBtn = !loading && status === 'OPEN' && candidates.length === 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -35,30 +39,47 @@ export default function RecommendScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <LinearGradient
-          colors={gradient.cream}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.infoCard}
-        >
-          <Text style={styles.infoTitle}>💡 추천 점수 기준</Text>
-          <Text style={styles.infoBody}>
-            재료 소진율 · 추가구매 최소화 · 조리 난이도를 종합해 계산해요
-          </Text>
-        </LinearGradient>
+        {showGenerateBtn ? (
+          <View style={styles.generateWrap}>
+            <Text style={styles.generateTitle}>아직 AI 추천이 없어요</Text>
+            <Text style={styles.generateSub}>
+              버튼을 누르면 재료 기반으로 최적 메뉴를 추천해 드려요
+            </Text>
+            <Button
+              label={generating ? '추천 생성 중…' : 'AI 추천 생성하기'}
+              onPress={generate}
+              disabled={generating}
+              style={styles.generateBtn}
+            />
+          </View>
+        ) : (
+          <>
+            <LinearGradient
+              colors={gradient.cream}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.infoCard}
+            >
+              <Text style={styles.infoTitle}>💡 추천 점수 기준</Text>
+              <Text style={styles.infoBody}>
+                재료 소진율 · 추가구매 최소화 · 조리 난이도를 종합해 계산해요
+              </Text>
+            </LinearGradient>
 
-        {candidates.map((menu, idx) => (
-          <MenuCard
-            key={menu.name}
-            menu={menu}
-            rank={idx}
-            selected={chosenIdx === idx}
-            onChoose={() => {
-              setChosenIdx(idx);
-              router.back();
-            }}
-          />
-        ))}
+            {candidates.map((menu, idx) => (
+              <MenuCard
+                key={menu.name}
+                menu={menu}
+                rank={idx}
+                selected={chosenIdx === idx}
+                onChoose={() => {
+                  setChosenIdx(idx);
+                  router.back();
+                }}
+              />
+            ))}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -313,5 +334,32 @@ const styles = StyleSheet.create({
   },
   chooseBtn: {
     marginTop: space.x6,
+  },
+  generateWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: space.screenX,
+    paddingTop: 80,
+    gap: space.x4,
+  },
+  generateTitle: {
+    fontSize: font.size.title,
+    fontFamily: font.family.bold,
+    color: color.ink,
+    letterSpacing: font.tracking.tight,
+    textAlign: 'center',
+  },
+  generateSub: {
+    fontSize: font.size.body,
+    fontFamily: font.family.medium,
+    color: color.ink3,
+    letterSpacing: font.tracking.snug,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  generateBtn: {
+    marginTop: space.x6,
+    width: '100%',
   },
 });

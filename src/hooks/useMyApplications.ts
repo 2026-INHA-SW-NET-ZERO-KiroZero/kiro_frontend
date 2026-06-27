@@ -5,10 +5,10 @@ import { apiRequest } from '@/lib/apiClient';
 import { mySessionItemToApplication } from '@/lib/derive';
 import type { DataResult, MyApplication, MySessionListResponse } from '@/types';
 
-import { useApiData } from './useApiData';
+import { type AsyncResult, useApiData } from './useApiData';
 
 /** 다가오는 모임 목록 — COMPLETED(지난 모임)는 제외한다. */
-export function useMyApplications(): DataResult<MyApplication[]> {
+export function useMyApplications(): AsyncResult<MyApplication[]> {
   const fetcher = useCallback(async (): Promise<MyApplication[]> => {
     const res = await apiRequest<MySessionListResponse>('/me/sessions');
     return res.sessions.filter((s) => s.status !== 'COMPLETED').map(mySessionItemToApplication);

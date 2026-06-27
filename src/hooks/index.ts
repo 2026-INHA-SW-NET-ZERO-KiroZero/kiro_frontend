@@ -15,6 +15,8 @@ export {
   useDecidedMenu,
   useSubmitVote,
   useVoteConfirmed,
+  useRecommendation,
+  useVoteRecommendation,
 } from './useMenus';
 export { useNotifications } from './useNotifications';
 export type { NotifResult } from './useNotifications';

@@ -30,5 +30,15 @@ export function joinSlot(slotId: number, body: JoinSlotRequest): Promise<JoinSlo
 
 /** 방 나가기. `DELETE /api/v1/slots/{slotId}/join` */
 export function leaveSlot(slotId: number): Promise<LeaveSlotResponse> {
-  return apiRequest<LeaveSlotResponse>(`/slots/${slotId}/join`, { method: 'DELETE' });
+  console.log('[leaveSlot] REQUEST', { slotId });
+  return apiRequest<LeaveSlotResponse>(`/slots/${slotId}/join`, { method: 'DELETE' }).then(
+    (res) => {
+      console.log('[leaveSlot] RESPONSE', res);
+      return res;
+    },
+    (err: unknown) => {
+      console.error('[leaveSlot] ERROR', err);
+      throw err;
+    },
+  );
 }

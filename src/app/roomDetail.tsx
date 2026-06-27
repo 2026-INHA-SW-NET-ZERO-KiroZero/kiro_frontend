@@ -333,7 +333,6 @@ export default function RoomDetailScreen() {
             .then(() => {
               setJoinedOverride(true);
               setShowJoinSheet(false);
-              // 정원이 가득 차면(3/4 → 4/4) 매치 확정 → 투표 페이지로 이동.
               const willBeFull = baseCount + 1 >= (room.capacity ?? 4);
               if (willBeFull) {
                 router.push('/myApplication');

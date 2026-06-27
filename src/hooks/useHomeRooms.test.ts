@@ -10,6 +10,7 @@ function room(baseCount: number, over: Partial<Room> = {}): Room {
     date: '06.26 (금)',
     time: '16:00',
     place: '1호관 517호',
+    stationCode: '인하대역',
     tags: ['저녁', '조리실습실'],
     capacity: 4,
     baseCount,

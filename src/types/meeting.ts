@@ -35,6 +35,7 @@ export interface PastMeeting {
   /** 날짜+시각 표기 (예: '06.18 (목) 19:00'). */
   date: string;
   place: string;
+  stationCode?: string;
   /** 참여 인원 표기 (예: '4/4명'). */
   members: string;
   state: string;

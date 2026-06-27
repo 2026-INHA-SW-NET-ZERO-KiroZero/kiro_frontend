@@ -10,6 +10,7 @@ export interface MyApplication {
   id: string;
   title: string;
   place: string;
+  stationCode?: string;
   date: string;
   time: string;
   capacity: number;

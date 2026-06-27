@@ -4,9 +4,14 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { getLatestRecommendation, submitVoteApi } from '@/lib/sessionApi';
+import { getLatestRecommendation, requestRecommendation, submitVoteApi } from '@/lib/sessionApi';
 import type { DecidedMenu, MenuCandidate, VoteMenu } from '@/types';
-import type { MenuCandidateResponse, MenuVoteRequest, MenuVoteResponse } from '@/types/session';
+import type {
+  MenuCandidateResponse,
+  MenuVoteRequest,
+  MenuVoteResponse,
+  SessionStatus,
+} from '@/types/session';
 
 import { useApiData, type AsyncResult } from './useApiData';
 
@@ -166,4 +171,100 @@ export function useVoteConfirmed(
   }, [slotId, enabled, confirmed]);
 
   return { confirmed, voteSummary };
+}
+
+interface UseRecommendationResult {
+  status: SessionStatus;
+  candidates: MenuCandidate[];
+  loading: boolean;
+  error: Error | null;
+  /** POST /sessions/{slotId}/recommendations 호출 후 GET latest 재조회. */
+  generate: () => Promise<void>;
+  generating: boolean;
+}
+
+/** AI 추천 생성 + 후보 조회를 묶은 훅. recommend.tsx에서 사용. */
+export function useRecommendation(slotId: number): UseRecommendationResult {
+  const [generating, setGenerating] = useState(false);
+
+  const fetcher = useCallback(
+    () =>
+      getLatestRecommendation(slotId).then((res) => ({
+        status: res.status,
+        candidates: res.candidates.map(toMenuCandidate),
+      })),
+    [slotId],
+  );
+
+  const { data, loading, error, refetch } = useApiData(fetcher, {
+    initial: { status: 'OPEN' as SessionStatus, candidates: [] },
+    isEmpty: (d) => d.candidates.length === 0,
+  });
+
+  const generate = useCallback(async () => {
+    setGenerating(true);
+    try {
+      await requestRecommendation(slotId);
+      refetch();
+    } finally {
+      setGenerating(false);
+    }
+  }, [slotId, refetch]);
+
+  return {
+    status: data.status,
+    candidates: data.candidates,
+    loading,
+    error,
+    generate,
+    generating,
+  };
+}
+
+interface UseVoteRecommendationResult {
+  status: SessionStatus;
+  voteMenus: VoteMenu[];
+  loading: boolean;
+  error: Error | null;
+  /** POST /sessions/{slotId}/recommendations 호출 후 GET latest 재조회. */
+  generate: () => Promise<void>;
+  generating: boolean;
+}
+
+/** 투표 단계에서 추천 생성 + VoteMenu 목록 조회를 묶은 훅. MyApplicationScreen에서 사용. */
+export function useVoteRecommendation(slotId: number): UseVoteRecommendationResult {
+  const [generating, setGenerating] = useState(false);
+
+  const fetcher = useCallback(
+    () =>
+      getLatestRecommendation(slotId).then((res) => ({
+        status: res.status,
+        voteMenus: res.candidates.map((c) => toVoteMenu(c, 0)),
+      })),
+    [slotId],
+  );
+
+  const { data, loading, error, refetch } = useApiData(fetcher, {
+    initial: { status: 'OPEN' as SessionStatus, voteMenus: [] },
+    isEmpty: (d) => d.voteMenus.length === 0,
+  });
+
+  const generate = useCallback(async () => {
+    setGenerating(true);
+    try {
+      await requestRecommendation(slotId);
+      refetch();
+    } finally {
+      setGenerating(false);
+    }
+  }, [slotId, refetch]);
+
+  return {
+    status: data.status,
+    voteMenus: data.voteMenus,
+    loading,
+    error,
+    generate,
+    generating,
+  };
 }

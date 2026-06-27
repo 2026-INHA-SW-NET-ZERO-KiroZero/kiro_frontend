@@ -4,7 +4,8 @@
  *
  * 데이터는 전부 훅 경유: useMyApplications, usePastMeetings, useNotifications(알림 dot).
  */
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -31,8 +32,15 @@ function juneDay(date: string): number | null {
 
 export function MeetingsScreen() {
   const router = useRouter();
-  const { data: applications } = useMyApplications();
-  const { data: pastMeetings } = usePastMeetings();
+  const { data: applications, refetch: refetchApplications } = useMyApplications();
+  const { data: pastMeetings, refetch: refetchPastMeetings } = usePastMeetings();
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchApplications();
+      refetchPastMeetings();
+    }, [refetchApplications, refetchPastMeetings]),
+  );
   const { data: notifs } = useNotifications();
   const hasUnread = notifs.some((n) => n.unread);
 
@@ -152,6 +160,7 @@ function UpcomingCard({ app, onPress }: { app: MyApplication; onPress: () => voi
       <View style={styles.placeRow}>
         <Icon name="location-on" size={18} color={color.textMute} />
         <Text style={styles.place}>{app.place}</Text>
+        {app.stationCode != null && <Text style={styles.station}>{app.stationCode}</Text>}
       </View>
       <View style={styles.cardFooter}>
         <View style={styles.footerLeft}>
@@ -188,6 +197,7 @@ function PastCard({ meeting, onPress }: { meeting: PastMeeting; onPress: () => v
       <View style={styles.placeRow}>
         <Icon name="location-on" size={18} color={color.textMute} />
         <Text style={styles.place}>{meeting.place}</Text>
+        {meeting.stationCode != null && <Text style={styles.station}>{meeting.stationCode}</Text>}
       </View>
       <View style={styles.cardFooter}>
         <View style={styles.footerLeft}>
@@ -344,6 +354,12 @@ const styles = StyleSheet.create({
     fontSize: font.size.smx,
     fontFamily: font.family.medium,
     color: color.textMute,
+    letterSpacing: font.tracking.snug,
+  },
+  station: {
+    fontSize: font.size.smx,
+    fontFamily: font.family.medium,
+    color: color.textFaint,
     letterSpacing: font.tracking.snug,
   },
   cardFooter: {

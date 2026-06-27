@@ -43,12 +43,34 @@ export function requestRecommendation(slotId: number): Promise<RecommendationRes
 
 /** 최신 추천 + 선택 메뉴. `GET /api/v1/sessions/{slotId}/recommendations/latest` */
 export function getLatestRecommendation(slotId: number): Promise<LatestRecommendationResponse> {
-  return apiRequest<LatestRecommendationResponse>(`/sessions/${slotId}/recommendations/latest`);
+  console.log('[getLatestRecommendation] REQUEST', { slotId });
+  return apiRequest<LatestRecommendationResponse>(
+    `/sessions/${slotId}/recommendations/latest`,
+  ).then(
+    (res) => {
+      console.log('[getLatestRecommendation] RESPONSE', res);
+      return res;
+    },
+    (err: unknown) => {
+      console.error('[getLatestRecommendation] ERROR', err);
+      throw err;
+    },
+  );
 }
 
 /** 메뉴 투표. `POST /api/v1/sessions/{slotId}/votes` */
 export function submitVoteApi(slotId: number, body: MenuVoteRequest): Promise<MenuVoteResponse> {
-  return apiRequest<MenuVoteResponse>(`/sessions/${slotId}/votes`, { method: 'POST', body });
+  console.log('[submitVote] REQUEST', { slotId, body });
+  return apiRequest<MenuVoteResponse>(`/sessions/${slotId}/votes`, { method: 'POST', body }).then(
+    (res) => {
+      console.log('[submitVote] RESPONSE', res);
+      return res;
+    },
+    (err: unknown) => {
+      console.error('[submitVote] ERROR', err);
+      throw err;
+    },
+  );
 }
 
 /** 내 모임/신청 세션 목록. `GET /api/v1/me/sessions` */

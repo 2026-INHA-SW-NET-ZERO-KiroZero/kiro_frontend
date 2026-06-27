@@ -7,11 +7,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
-import { useDecidedMenu, useMyApplication, usePartyPool, useVoteMenus } from '@/hooks';
+import { useDecidedMenu, useMyApplication, usePartyPool, useVoteRecommendation } from '@/hooks';
+import { leaveSlot } from '@/lib/slotApi';
 import type { MenuRole, PartyProfile, VoteMenu } from '@/types';
 import {
   applicationStage,
@@ -44,12 +45,18 @@ export function MyApplicationScreen() {
   const slotId = Number(id ?? '0');
   const { data: application } = useMyApplication(id ?? 'app1');
   const { data: partyPool } = usePartyPool(slotId);
-  const { data: voteMenus } = useVoteMenus(slotId);
+  const {
+    status: recStatus,
+    voteMenus,
+    generate: generateRec,
+    generating,
+  } = useVoteRecommendation(slotId);
   const { data: decided } = useDecidedMenu(slotId);
 
   const [myVote, setMyVote] = useState<number | null>(null);
   const [votingDone, setVotingDone] = useState(false);
   const [voteReason, setVoteReason] = useState('');
+  const [canceling, setCanceling] = useState(false);
 
   if (!application) {
     return <SafeAreaView style={styles.safe} edges={['top']} />;
@@ -71,6 +78,27 @@ export function MyApplicationScreen() {
   const pickVote = (index: number) => {
     setMyVote(index);
     if (index !== E_OPTION) setVoteReason('');
+  };
+
+  const cancelApplication = () => {
+    Alert.alert('신청 취소', '정말로 신청을 취소하시겠어요?', [
+      { text: '돌아가기', style: 'cancel' },
+      {
+        text: '취소하기',
+        style: 'destructive',
+        onPress: async () => {
+          setCanceling(true);
+          try {
+            await leaveSlot(slotId);
+            router.back();
+          } catch {
+            Alert.alert('오류', '신청 취소에 실패했어요. 다시 시도해주세요.');
+          } finally {
+            setCanceling(false);
+          }
+        },
+      },
+    ]);
   };
 
   const submitVote = () => {
@@ -124,24 +152,41 @@ export function MyApplicationScreen() {
           />
         )}
 
-        {stage === 'voting' && (
-          <VotingStage
-            voteMenus={voteMenus}
-            myVote={myVote}
-            eSel={eSel}
-            voteReason={voteReason}
-            onPick={pickVote}
-            onChangeReason={setVoteReason}
-          />
-        )}
+        {stage === 'voting' &&
+          (recStatus === 'OPEN' && voteMenus.length === 0 ? (
+            <View style={styles.generateWrap}>
+              <Text style={styles.generateTitle}>아직 AI 추천이 없어요</Text>
+              <Text style={styles.generateSub}>
+                버튼을 누르면 재료 기반으로 최적 메뉴를 추천해 드려요
+              </Text>
+              <Pressable
+                onPress={generateRec}
+                disabled={generating}
+                style={[styles.generateBtn, generating && styles.generateBtnDisabled]}
+              >
+                <Text style={styles.generateBtnText}>
+                  {generating ? '추천 생성 중…' : 'AI 추천 생성하기'}
+                </Text>
+              </Pressable>
+            </View>
+          ) : (
+            <VotingStage
+              voteMenus={voteMenus}
+              myVote={myVote}
+              eSel={eSel}
+              voteReason={voteReason}
+              onPick={pickVote}
+              onChangeReason={setVoteReason}
+            />
+          ))}
 
         {stage === 'result' && <ResultStage decided={decided} />}
       </ScrollView>
 
       {stage === 'recruiting' && (
         <LinearGradient colors={[color.appBgFade, color.appBg]} style={styles.sticky}>
-          <Pressable style={styles.cancelBtn}>
-            <Text style={styles.cancelBtnText}>신청 취소하기</Text>
+          <Pressable onPress={cancelApplication} disabled={canceling} style={styles.cancelBtn}>
+            <Text style={styles.cancelBtnText}>{canceling ? '취소 중...' : '신청 취소하기'}</Text>
           </Pressable>
         </LinearGradient>
       )}
@@ -1341,6 +1386,43 @@ const styles = StyleSheet.create({
   },
   voteBtn: { borderRadius: radius.card, paddingVertical: space.x7, alignItems: 'center' },
   voteBtnText: {
+    fontSize: font.size.lg,
+    fontFamily: font.family.bold,
+    color: color.white,
+    letterSpacing: font.tracking.snug,
+  },
+  generateWrap: {
+    alignItems: 'center',
+    paddingHorizontal: space.screenX,
+    paddingTop: 60,
+    gap: space.x4,
+  },
+  generateTitle: {
+    fontSize: font.size.title,
+    fontFamily: font.family.bold,
+    color: color.ink,
+    letterSpacing: font.tracking.tight,
+    textAlign: 'center',
+  },
+  generateSub: {
+    fontSize: font.size.body,
+    fontFamily: font.family.medium,
+    color: color.ink3,
+    letterSpacing: font.tracking.snug,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  generateBtn: {
+    marginTop: space.x6,
+    backgroundColor: color.brand,
+    paddingVertical: space.x4,
+    paddingHorizontal: space.x8,
+    borderRadius: radius.pill,
+  },
+  generateBtnDisabled: {
+    backgroundColor: applicationStage.voteBtnDisabled,
+  },
+  generateBtnText: {
     fontSize: font.size.lg,
     fontFamily: font.family.bold,
     color: color.white,

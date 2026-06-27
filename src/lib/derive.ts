@@ -119,6 +119,7 @@ export function mySessionItemToApplication(item: MySessionItemResponse): MyAppli
     id: String(item.slotId),
     title: item.selectedMenu?.menuName ?? item.placeName,
     place: item.placeName,
+    stationCode: item.stationCode,
     date: formatDateLabel(item.date),
     time: item.startTime,
     capacity: item.capacity,
@@ -139,6 +140,7 @@ export function mySessionItemToPastMeetingPartial(item: MySessionItemResponse): 
     title: name,
     date: `${formatDateLabel(item.date)} ${item.startTime}`,
     place: item.placeName,
+    stationCode: item.stationCode,
     members: `${Number(item.participantCount)}/${item.capacity}명`,
     state: '조리 완료',
     saved: UNKNOWN,
@@ -178,7 +180,7 @@ export function mySessionDetailAndResultToPastMeeting(
   });
 
   const total = participants.length;
-  const foodKg = `${result.estimatedFoodWasteReducedGrams.toFixed(1)}kg`;
+  const foodKg = `${(result.estimatedFoodWasteReducedGrams / 1000).toFixed(1)}kg`;
 
   return {
     id: String(detail.slotId),
