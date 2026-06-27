@@ -14,6 +14,6 @@ export function useResultTotal(): AsyncResult<MyResultTotalResponse | null> {
   );
   return useApiData<MyResultTotalResponse | null>(fetcher, {
     initial: null,
-    isEmpty: (d) => d === null || d.monthlyResults.length === 0,
+    isEmpty: (d) => d === null || (d.monthlyResults?.length ?? 0) === 0,
   });
 }
