@@ -22,7 +22,12 @@ const APP_PALETTE = [color.purple, color.brand, color.eco, color.goldSoft];
 /** 다가오는 모임 아바타 머리글자 (dc.html ['나','준','서','도']). */
 const PART_LABELS = ['나', '준', '서', '도'];
 
-const CALENDAR_WEEKS = buildCalendarWeeks();
+/** "06.26 (금)" 또는 "06.26 (금) 18:00" → 6월이면 day 숫자, 아니면 null. */
+function juneDay(date: string): number | null {
+  if (!date.startsWith('06.')) return null;
+  const d = parseInt(date.slice(3, 5), 10);
+  return isNaN(d) ? null : d;
+}
 
 export function MeetingsScreen() {
   const router = useRouter();
@@ -30,6 +35,13 @@ export function MeetingsScreen() {
   const { data: pastMeetings } = usePastMeetings();
   const { data: notifs } = useNotifications();
   const hasUnread = notifs.some((n) => n.unread);
+
+  const meetingDays = new Set(
+    [...applications, ...pastMeetings]
+      .map((m) => juneDay(m.date))
+      .filter((d): d is number => d !== null),
+  );
+  const calendarWeeks = buildCalendarWeeks(meetingDays);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -63,7 +75,7 @@ export function MeetingsScreen() {
               </Text>
             ))}
           </View>
-          {CALENDAR_WEEKS.map((week, wi) => (
+          {calendarWeeks.map((week, wi) => (
             <View key={wi} style={styles.week}>
               {week.map((cell, ci) => (
                 <View key={ci} style={styles.cell}>
