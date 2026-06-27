@@ -181,11 +181,13 @@ interface UseRecommendationResult {
   /** POST /sessions/{slotId}/recommendations 호출 후 GET latest 재조회. */
   generate: () => Promise<void>;
   generating: boolean;
+  generateError: Error | null;
 }
 
 /** AI 추천 생성 + 후보 조회를 묶은 훅. recommend.tsx에서 사용. */
 export function useRecommendation(slotId: number): UseRecommendationResult {
   const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<Error | null>(null);
 
   const fetcher = useCallback(
     () =>
@@ -203,9 +205,13 @@ export function useRecommendation(slotId: number): UseRecommendationResult {
 
   const generate = useCallback(async () => {
     setGenerating(true);
+    setGenerateError(null);
     try {
       await requestRecommendation(slotId);
       refetch();
+    } catch (e) {
+      const err = e instanceof Error ? e : new Error('AI 추천 생성에 실패했어요.');
+      setGenerateError(err);
     } finally {
       setGenerating(false);
     }
@@ -218,6 +224,7 @@ export function useRecommendation(slotId: number): UseRecommendationResult {
     error,
     generate,
     generating,
+    generateError,
   };
 }
 
@@ -229,11 +236,13 @@ interface UseVoteRecommendationResult {
   /** POST /sessions/{slotId}/recommendations 호출 후 GET latest 재조회. */
   generate: () => Promise<void>;
   generating: boolean;
+  generateError: Error | null;
 }
 
 /** 투표 단계에서 추천 생성 + VoteMenu 목록 조회를 묶은 훅. MyApplicationScreen에서 사용. */
 export function useVoteRecommendation(slotId: number): UseVoteRecommendationResult {
   const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<Error | null>(null);
 
   const fetcher = useCallback(
     () =>
@@ -251,9 +260,13 @@ export function useVoteRecommendation(slotId: number): UseVoteRecommendationResu
 
   const generate = useCallback(async () => {
     setGenerating(true);
+    setGenerateError(null);
     try {
       await requestRecommendation(slotId);
       refetch();
+    } catch (e) {
+      const err = e instanceof Error ? e : new Error('AI 추천 생성에 실패했어요.');
+      setGenerateError(err);
     } finally {
       setGenerating(false);
     }
@@ -266,5 +279,6 @@ export function useVoteRecommendation(slotId: number): UseVoteRecommendationResu
     error,
     generate,
     generating,
+    generateError,
   };
 }

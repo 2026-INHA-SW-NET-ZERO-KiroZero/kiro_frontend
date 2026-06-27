@@ -5,8 +5,8 @@
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Icon } from '@/components';
@@ -17,10 +17,16 @@ import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 export default function RecommendScreen() {
   const router = useRouter();
   const { slotId } = useLocalSearchParams<{ slotId?: string }>();
-  const { status, candidates, loading, generate, generating } = useRecommendation(
+  const { status, candidates, loading, generate, generating, generateError } = useRecommendation(
     Number(slotId ?? '0'),
   );
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (generateError) {
+      Alert.alert('추천 생성 실패', generateError.message);
+    }
+  }, [generateError]);
 
   const showGenerateBtn = !loading && status === 'OPEN' && candidates.length === 0;
 

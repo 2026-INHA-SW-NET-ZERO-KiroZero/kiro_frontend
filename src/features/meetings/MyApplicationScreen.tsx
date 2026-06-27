@@ -6,7 +6,7 @@
  */
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -50,7 +50,14 @@ export function MyApplicationScreen() {
     voteMenus,
     generate: generateRec,
     generating,
+    generateError,
   } = useVoteRecommendation(slotId);
+
+  useEffect(() => {
+    if (generateError) {
+      Alert.alert('추천 생성 실패', generateError.message);
+    }
+  }, [generateError]);
   const { data: decided } = useDecidedMenu(slotId);
 
   const [myVote, setMyVote] = useState<number | null>(null);

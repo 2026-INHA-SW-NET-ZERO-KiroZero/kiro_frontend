@@ -36,9 +36,19 @@ export function updateSessionIngredients(
 
 /** 메뉴 추천 요청. `POST /api/v1/sessions/{slotId}/recommendations` */
 export function requestRecommendation(slotId: number): Promise<RecommendationResponse> {
+  console.log('[requestRecommendation] REQUEST', { slotId });
   return apiRequest<RecommendationResponse>(`/sessions/${slotId}/recommendations`, {
     method: 'POST',
-  });
+  }).then(
+    (res) => {
+      console.log('[requestRecommendation] RESPONSE', res);
+      return res;
+    },
+    (err: unknown) => {
+      console.error('[requestRecommendation] ERROR', err);
+      throw err;
+    },
+  );
 }
 
 /** 최신 추천 + 선택 메뉴. `GET /api/v1/sessions/{slotId}/recommendations/latest` */
