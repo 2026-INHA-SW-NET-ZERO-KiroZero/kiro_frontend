@@ -3,7 +3,7 @@
  * 헤더 → 크림 info 카드 → 메뉴 후보 3개 카드(랭크칩·이모지·이름·시간·난이도·재료칩·선택 버튼).
  * 데이터는 useMenuCandidates() 훅 경유.
  */
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -16,7 +16,8 @@ import { color, font, gradient, radius, shadow, space } from '@/theme/theme';
 
 export default function RecommendScreen() {
   const router = useRouter();
-  const { data: candidates } = useMenuCandidates();
+  const { slotId } = useLocalSearchParams<{ slotId?: string }>();
+  const { data: candidates } = useMenuCandidates(Number(slotId ?? '0'));
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
 
   return (

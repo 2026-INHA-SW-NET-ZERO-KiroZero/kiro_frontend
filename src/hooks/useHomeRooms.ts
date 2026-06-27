@@ -79,8 +79,8 @@ export function toHomeRoomCard(room: Room): HomeRoomCard {
 }
 
 /** 홈 화면용 방 카드 데이터. `recRooms`=앞 3개, `openRooms`=전체. */
-export function useHomeRooms(): UseHomeRoomsResult {
-  const { data, loading, isEmpty } = useRooms();
+export function useHomeRooms(date: string): UseHomeRoomsResult {
+  const { data, loading, isEmpty } = useRooms(date);
   const openRooms = data.map(toHomeRoomCard);
   return {
     recRooms: openRooms.slice(0, 3),

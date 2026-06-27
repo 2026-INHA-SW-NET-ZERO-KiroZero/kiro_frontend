@@ -41,10 +41,11 @@ function skillStyle(skill: string): { fg: string; bg: string } {
 export function MyApplicationScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const slotId = Number(id ?? '0');
   const { data: application } = useMyApplication(id ?? 'app1');
-  const { data: partyPool } = usePartyPool();
-  const { data: voteMenus } = useVoteMenus();
-  const { data: decided } = useDecidedMenu();
+  const { data: partyPool } = usePartyPool(slotId);
+  const { data: voteMenus } = useVoteMenus(slotId);
+  const { data: decided } = useDecidedMenu(slotId);
 
   const [myVote, setMyVote] = useState<number | null>(null);
   const [votingDone, setVotingDone] = useState(false);
@@ -230,9 +231,10 @@ function RecruitingStage({
       </Text>
       <Text style={styles.partsSub}>개인정보 보호를 위해 모든 참여자는 익명으로 표시돼요</Text>
       <View style={styles.partList}>
-        {Array.from({ length: count }, (_, idx) => (
-          <ParticipantCard key={idx} idx={idx} profile={partyPool[idx % partyPool.length]} />
-        ))}
+        {partyPool.length > 0 &&
+          Array.from({ length: count }, (_, idx) => (
+            <ParticipantCard key={idx} idx={idx} profile={partyPool[idx % partyPool.length]} />
+          ))}
       </View>
     </>
   );
@@ -488,6 +490,7 @@ function VoteCard({
 /* ------------------------------ result ------------------------------ */
 
 function ResultStage({ decided }: { decided: ReturnType<typeof useDecidedMenu>['data'] }) {
+  if (decided === null) return null;
   return (
     <>
       <View style={styles.resultHeader}>

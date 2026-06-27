@@ -3,7 +3,7 @@
  * 헤더 → 초록 info 배너 → 통합 식재료 리스트(수량 편집) → Sticky 초록 "조리 완료 처리하기".
  * 데이터는 useAggIngredients() 훅 경유, 수량은 시드 qty로 prefill.
  */
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,7 +15,8 @@ import { color, font, radius, space } from '@/theme/theme';
 export default function UsageScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { data: aggList } = useAggIngredients();
+  const { slotId } = useLocalSearchParams<{ slotId?: string }>();
+  const { data: aggList } = useAggIngredients(Number(slotId ?? '0'));
   const [edited, setEdited] = useState<Record<number, string>>({});
 
   return (

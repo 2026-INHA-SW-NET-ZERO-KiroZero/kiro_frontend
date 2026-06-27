@@ -9,7 +9,13 @@ export { useHomeRooms, toHomeRoomCard } from './useHomeRooms';
 export type { HomeRoomCard, HomeRoomAvatar, UseHomeRoomsResult } from './useHomeRooms';
 export { useAggIngredients } from './useAggIngredients';
 export { useIngredients } from './useIngredients';
-export { useMenuCandidates, useVoteMenus, useDecidedMenu } from './useMenus';
+export {
+  useMenuCandidates,
+  useVoteMenus,
+  useDecidedMenu,
+  useSubmitVote,
+  useVoteConfirmed,
+} from './useMenus';
 export { useNotifications } from './useNotifications';
 export type { NotifResult } from './useNotifications';
 export { useMyApplications, useMyApplication } from './useMyApplications';

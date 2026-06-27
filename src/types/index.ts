@@ -39,15 +39,26 @@ export type { PastMenu, SeedEval, PastPart, PastMeeting } from './meeting';
 export type { MonthlyResultSummaryResponse, MyResultTotalResponse } from './result';
 export type { DataResult } from './query';
 export type {
-  SlotStatus,
-  SelectedMenuSummaryResponse,
-  SessionIngredientResponse,
+  SessionStatus,
+  VoteType,
   SessionIngredientStatusResponse,
   SessionParticipantStatusResponse,
+  SharedIngredientPoolItemResponse,
   SessionStatusResponse,
+  UpdateSessionIngredientsRequest,
+  UpdateSessionIngredientsResponse,
+  MenuCandidateResponse,
+  RecommendationResponse,
+  LatestRecommendationResponse,
+  SelectedMenuSummaryResponse,
+  MenuVoteRequest,
+  MenuVoteResponse,
+  SessionIngredientResponse,
   MySessionItemResponse,
   MySessionListResponse,
   MySessionDetailResponse,
+} from './session';
+export type {
   PhotoUrlsResponse,
   SessionResultResponse,
   ImageUploadResponse,
