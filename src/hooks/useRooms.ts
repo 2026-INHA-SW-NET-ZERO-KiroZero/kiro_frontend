@@ -28,6 +28,7 @@ function slotItemToRoom(slot: SlotListItemResponse): Room {
     host: '',
     parts: [],
     prev: [],
+    status: slot.status,
   };
 }
 
@@ -49,6 +50,7 @@ function slotDetailToRoom(slot: SlotDetailResponse): Room {
     })),
     prev: [],
     joined: slot.joined,
+    status: slot.status,
   };
 }
 

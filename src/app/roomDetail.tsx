@@ -10,6 +10,7 @@ import { JoinSheet } from '@/features/roomDetail/JoinSheet';
 import { useAggIngredients } from '@/hooks/useAggIngredients';
 import { usePartyPool } from '@/hooks/usePartyPool';
 import { useRoomDetail } from '@/hooks/useRooms';
+import { useSettlement } from '@/hooks/useSettlement';
 import { joinSlot, leaveSlot } from '@/lib/slotApi';
 import { roomDisplay, type RoomState } from '@/lib/roomDisplay';
 import type { JoinSlotRequest, SkillLevel } from '@/types';
@@ -24,13 +25,17 @@ const ACCORDIONS = [
   { title: '환불 정책', body: '모임 전날 자정 이전 취소 시 전액 환불됩니다.' },
 ] as const;
 
+function roomStateFromApi(status: string | undefined, count: number, capacity: number): RoomState {
+  if (status === 'COMPLETED') return 'COOKED';
+  if (status === 'MENU_PROPOSED' || count >= capacity) return 'CONFIRMED';
+  return 'OPEN';
+}
+
 export default function RoomDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const [heroStatus] = useState<RoomState>('OPEN');
-  const [hasMenu] = useState(false);
   // null = API 값 사용, true/false = 로컬 낙관적 업데이트
   const [joinedOverride, setJoinedOverride] = useState<boolean | null>(null);
   const [showJoinSheet, setShowJoinSheet] = useState(false);
@@ -41,6 +46,7 @@ export default function RoomDetailScreen() {
   const { data: room, refetch: refetchRoom } = useRoomDetail(id ?? '');
   const { data: partyPool, refetch: refetchPartyPool } = usePartyPool(slotId);
   const { data: aggList, refetch: refetchAggList } = useAggIngredients(slotId);
+  const { data: checklist } = useSettlement(slotId);
   // 로컬 override가 없으면 API 응답 joined 값을 사용
   const joined = joinedOverride ?? room?.joined ?? false;
 
@@ -57,10 +63,12 @@ export default function RoomDetailScreen() {
         ? Math.max(0, baseCount - 1)
         : baseCount,
   );
+  const heroStatus = roomStateFromApi(room?.status, liveCount, capacity);
+  const hasMenu = Boolean(checklist?.menuName);
 
   const display = roomDisplay({
     state: heroStatus,
-    capacity: room?.capacity ?? 4,
+    capacity,
     count: liveCount,
     joined,
     hasMenu,
@@ -318,7 +326,7 @@ export default function RoomDetailScreen() {
         {heroStatus !== 'OPEN' && hasMenu ? (
           <View style={styles.menuCard}>
             <Text style={styles.menuEmoji}>🍲</Text>
-            <Text style={styles.menuName}>소시지 김치 부대찌개</Text>
+            <Text style={styles.menuName}>{checklist?.menuName ?? '선택된 메뉴'}</Text>
             <Text style={styles.menuSelected}>선택된 메뉴</Text>
           </View>
         ) : null}
