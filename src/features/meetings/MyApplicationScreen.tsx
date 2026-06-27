@@ -102,30 +102,33 @@ export function MyApplicationScreen() {
   useEffect(() => {
     let active = true;
 
-    voteProgressStorage.get(slotId).then((progress) => {
-      if (!active || progress == null) return;
+    voteProgressStorage
+      .get(slotId)
+      .then((progress) => {
+        if (!active || progress == null) return;
 
-      const stale =
-        progress.recommendationCount !== recommendationCount ||
-        recStatus !== 'MENU_PROPOSED' ||
-        application?.hasSelectedMenu ||
-        votingDone;
+        const stale =
+          progress.recommendationCount !== recommendationCount ||
+          recStatus !== 'MENU_PROPOSED' ||
+          application?.hasSelectedMenu ||
+          votingDone;
 
-      if (stale) {
-        voteProgressStorage.clear(slotId);
-        return;
-      }
+        if (stale) {
+          voteProgressStorage.clear(slotId).catch(() => undefined);
+          return;
+        }
 
-      const voteIndex = voteIndexFromSubmittedVote(
-        voteMenus,
-        progress.voteType,
-        progress.candidateLabel,
-      );
+        const voteIndex = voteIndexFromSubmittedVote(
+          voteMenus,
+          progress.voteType,
+          progress.candidateLabel,
+        );
 
-      if (voteIndex == null) return;
-      setMyVote(voteIndex);
-      setWaitingVoteConfirmation(true);
-    });
+        if (voteIndex == null) return;
+        setMyVote(voteIndex);
+        setWaitingVoteConfirmation(true);
+      })
+      .catch(() => undefined);
 
     return () => {
       active = false;
@@ -193,19 +196,21 @@ export function MyApplicationScreen() {
     try {
       const response = await submitVoteApi(request);
       if (response.confirmed || response.selectedMenu != null) {
-        await voteProgressStorage.clear(slotId);
+        await voteProgressStorage.clear(slotId).catch(() => undefined);
         setWaitingVoteConfirmation(false);
         setVotingDone(true);
         refetchDecided();
         return;
       }
 
-      await voteProgressStorage.set({
-        slotId,
-        recommendationCount: response.recommendationCount,
-        voteType: request.voteType,
-        candidateLabel: request.candidateLabel,
-      });
+      await voteProgressStorage
+        .set({
+          slotId,
+          recommendationCount: response.recommendationCount,
+          voteType: request.voteType,
+          candidateLabel: request.candidateLabel,
+        })
+        .catch(() => undefined);
       setWaitingVoteConfirmation(true);
 
       if (request.voteType === 'E') {

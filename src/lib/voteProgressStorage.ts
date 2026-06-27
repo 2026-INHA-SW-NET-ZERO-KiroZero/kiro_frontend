@@ -12,7 +12,7 @@ export interface MenuVoteProgress {
 }
 
 function key(slotId: number): string {
-  return `${KEY_PREFIX}:${slotId}`;
+  return `${KEY_PREFIX}.${slotId}`;
 }
 
 export const voteProgressStorage = {
