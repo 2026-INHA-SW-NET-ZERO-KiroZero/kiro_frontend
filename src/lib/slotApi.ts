@@ -37,7 +37,9 @@ export function leaveSlot(slotId: number): Promise<LeaveSlotResponse> {
       return res;
     },
     (err: unknown) => {
-      console.error('[leaveSlot] ERROR', err);
+      const status =
+        err instanceof Error && 'status' in err ? (err as { status: number }).status : '?';
+      console.error('[leaveSlot] ERROR', { status, err });
       throw err;
     },
   );

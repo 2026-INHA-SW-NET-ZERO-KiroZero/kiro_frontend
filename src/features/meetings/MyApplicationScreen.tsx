@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
 import { useDecidedMenu, useMyApplication, usePartyPool, useVoteRecommendation } from '@/hooks';
+import { ApiError } from '@/lib/apiClient';
 import { leaveSlot } from '@/lib/slotApi';
 import type { MenuRole, PartyProfile, VoteMenu } from '@/types';
 import {
@@ -98,8 +99,12 @@ export function MyApplicationScreen() {
           try {
             await leaveSlot(slotId);
             router.back();
-          } catch {
-            Alert.alert('오류', '신청 취소에 실패했어요. 다시 시도해주세요.');
+          } catch (e) {
+            const msg =
+              e instanceof ApiError && e.status === 409
+                ? '취소가 불가능합니다.'
+                : '신청 취소에 실패했어요. 다시 시도해주세요.';
+            Alert.alert('취소 불가', msg);
           } finally {
             setCanceling(false);
           }
