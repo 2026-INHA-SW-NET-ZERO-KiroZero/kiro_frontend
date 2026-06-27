@@ -21,6 +21,7 @@ export type { NotifResult } from './useNotifications';
 export { useMyApplications, useMyApplication } from './useMyApplications';
 export { useSettlement } from './useSettlement';
 export { usePastMeetings, usePastMeeting } from './usePastMeetings';
+export type { PastMeetingResult } from './usePastMeetings';
 export { usePartyPool } from './usePartyPool';
 export { useReport } from './useReport';
 export type { ReportBar, ReportView, UseReportResult } from './useReport';

@@ -1,7 +1,7 @@
 /**
  * 2026년 6월 캘린더 그리드 빌더 (PRD §3.8 · dc.html `buildCalendar`).
  * 정적 레이아웃 계산이라 더미데이터(`src/data/`)가 아닌 순수 함수로 둔다.
- * 오늘=26(빨강 원), 모임일=11/18/26(🍚 마커).
+ * 오늘=26(빨강 원), 모임일 마커는 호출 측이 실제 모임 날짜 집합을 전달한다.
  */
 import { color } from '@/theme/theme';
 
@@ -17,7 +17,6 @@ export type CalendarCell = {
 };
 
 const TODAY = 26;
-const MEETING_DAYS: Record<number, string> = { 11: '🍚', 18: '🍚', 26: '🍚' };
 
 type RawCell = { d: number; muted: boolean };
 
@@ -28,8 +27,11 @@ function numColor(muted: boolean, col: number): string {
   return color.listInk; // 평일
 }
 
-/** 6월 그리드를 주(week) 단위 7칸 배열로 반환. (5주 × 7칸) */
-export function buildCalendarWeeks(): CalendarCell[][] {
+/**
+ * 6월 그리드를 주(week) 단위 7칸 배열로 반환. (5주 × 7칸)
+ * @param meetingDays 실제 모임이 있는 날(day) 숫자 집합.
+ */
+export function buildCalendarWeeks(meetingDays: Set<number>): CalendarCell[][] {
   const cells: RawCell[] = [{ d: 31, muted: true }]; // 5/31 (일)
   for (let d = 1; d <= 30; d++) cells.push({ d, muted: false });
   for (let d = 1; d <= 4; d++) cells.push({ d, muted: true }); // 7/1~7/4
@@ -42,7 +44,7 @@ export function buildCalendarWeeks(): CalendarCell[][] {
         label: c.d,
         numColor: isToday ? color.white : numColor(c.muted, col),
         isToday,
-        marker: !c.muted && MEETING_DAYS[c.d] ? MEETING_DAYS[c.d] : '',
+        marker: !c.muted && meetingDays.has(c.d) ? '🍚' : '',
       };
     });
     weeks.push(week);

@@ -58,3 +58,13 @@ export type {
   MySessionListResponse,
   MySessionDetailResponse,
 } from './session';
+export type {
+  PhotoUrlsResponse,
+  SessionResultResponse,
+  ImageUploadResponse,
+} from './api/mySession';
+export type {
+  ConsumptionRecordItemRequest,
+  CreateConsumptionRecordRequest,
+  CreateConsumptionRecordResponse,
+} from './api/consumptionRecord';

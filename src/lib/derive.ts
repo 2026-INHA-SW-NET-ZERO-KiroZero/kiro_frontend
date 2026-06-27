@@ -5,13 +5,35 @@
  * 평가 완료 모임의 표시값은 `seedEval`(완성 음식 소비율 + 재료별 소진율)을 기준으로 한다.
  * 값 출처: KiroZero.dc.html computed(refundScore/refundCredit/usageRows).
  */
-import type { PastMeeting } from '@/types';
+import { color } from '@/theme/theme';
+import { SKILL_TO_LABEL } from '@/types';
+import type {
+  MyApplication,
+  MySessionDetailResponse,
+  MySessionItemResponse,
+  PastMeeting,
+  PastPart,
+  SessionResultResponse,
+} from '@/types';
+
+import { formatDateLabel, parseIsoDate } from './format';
 
 /** 내가 가져온 재료 문자열 구분자 (예: '토마토 3개 · 양파 1개'). */
 const BROUGHT_SEP = ' · ';
 
 const LOW_CARBON_SCORE = 40; // 저탄소 메뉴 선택 고정 배점
 const RESERVE_LEAVES = 2000; // 모임당 예약 나뭇잎
+
+/** 참여자 아바타 식별색 순서 (dc.html `appPalette`). */
+const AVATAR_PALETTE = [color.purple, color.brand, color.eco, color.goldSoft];
+/** 탄소 1kg ≈ 자동차 주행 거리(km) 환산 계수. */
+const CARBON_KM_PER_KG = 4.17;
+/** 한 끼 분량(g) 환산 기준. */
+const GRAMS_PER_MEAL = 650;
+/** 목록 단계에서 알 수 없는(결과 API 필요) 값의 placeholder. */
+const UNKNOWN = '—';
+/** 메뉴/모임 기본 이모지. */
+const DEFAULT_EMOJI = '🍽';
 
 export function splitBrought(brought: string): string[] {
   return brought.split(BROUGHT_SEP).filter(Boolean);
@@ -74,4 +96,106 @@ export function derivePastEval(past: PastMeeting): PastEvalResult {
   const useAvg = useVals.length ? useVals.reduce((a, b) => a + b, 0) / useVals.length : past.rate;
   const eatPct = past.seedEval.food;
   return { eatPct, usageRows, refund: refundBreakdown(useAvg, eatPct) };
+}
+
+/* ----------------------------------------------------------------------------
+ * 내 모임(세션) API → 화면 shape 매핑 (issue #33)
+ * `GET /me/sessions` 항목과 `GET /me/sessions/{id}` + `GET /sessions/{id}/result`를
+ * 화면이 쓰는 MyApplication·PastMeeting shape으로 변환한다.
+ * -------------------------------------------------------------------------- */
+
+/** ISO date 기준 D-day 라벨 — 오늘 이후는 'D-n', 과거는 '마감'. */
+export function ddayLabel(iso: string): string {
+  const target = parseIsoDate(iso);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((target.getTime() - today.getTime()) / 86_400_000);
+  return diffDays >= 0 ? `D-${diffDays}` : '마감';
+}
+
+/** 내 모임 목록 항목 → 신청 내역 카드(다가오는 모임). */
+export function mySessionItemToApplication(item: MySessionItemResponse): MyApplication {
+  return {
+    id: String(item.slotId),
+    title: item.selectedMenu?.menuName ?? item.placeName,
+    place: item.placeName,
+    date: formatDateLabel(item.date),
+    time: item.startTime,
+    capacity: item.capacity,
+    count: Number(item.participantCount),
+    dday: ddayLabel(item.date),
+  };
+}
+
+/**
+ * 내 모임 목록 항목 → 지난 모임 카드(부분).
+ * 절감량·재료 소진율 등 결과값은 `GET /sessions/{id}/result` 없이는 알 수 없어 placeholder로 둔다.
+ */
+export function mySessionItemToPastMeetingPartial(item: MySessionItemResponse): PastMeeting {
+  const name = item.selectedMenu?.menuName ?? item.placeName;
+  return {
+    id: String(item.slotId),
+    emoji: DEFAULT_EMOJI,
+    title: name,
+    date: `${formatDateLabel(item.date)} ${item.startTime}`,
+    place: item.placeName,
+    members: `${Number(item.participantCount)}/${item.capacity}명`,
+    state: '조리 완료',
+    saved: UNKNOWN,
+    menu: { emoji: DEFAULT_EMOJI, name, time: '-', servings: '4인분' },
+    foodKg: UNKNOWN,
+    co2: UNKNOWN,
+    rate: 0,
+    km: UNKNOWN,
+    meals: UNKNOWN,
+    seedEval: { food: 0, use: {} },
+    parts: [],
+  };
+}
+
+/**
+ * 모임 상세 + 결과 → 지난 모임 전체 shape.
+ * 날짜/장소는 두 응답 어디에도 없어 placeholder로 둔다(목록 캐시 도입 시 개선).
+ */
+export function mySessionDetailAndResultToPastMeeting(
+  detail: MySessionDetailResponse,
+  result: SessionResultResponse,
+  myParticipantId: number,
+): PastMeeting {
+  const participants = detail.session.participants;
+  const parts: PastPart[] = participants.map((p, i) => {
+    const isMe = p.participantId === myParticipantId;
+    const names = isMe
+      ? detail.myIngredients.map((ing) => ing.nameKo)
+      : p.ingredients.map((ing) => ing.nameKo);
+    return {
+      label: isMe ? '나' : p.nickname,
+      isMe,
+      color: AVATAR_PALETTE[i % AVATAR_PALETTE.length],
+      skill: SKILL_TO_LABEL[p.cookingSkill],
+      brought: names.join(BROUGHT_SEP),
+    };
+  });
+
+  const total = participants.length;
+  const foodKg = `${result.estimatedFoodWasteReducedGrams.toFixed(1)}kg`;
+
+  return {
+    id: String(detail.slotId),
+    emoji: DEFAULT_EMOJI,
+    title: result.menuName,
+    date: UNKNOWN,
+    place: UNKNOWN,
+    members: `${total}/${total}명`,
+    state: '조리 완료',
+    saved: foodKg,
+    menu: { emoji: DEFAULT_EMOJI, name: result.menuName, time: '-', servings: '4인분' },
+    foodKg,
+    co2: `${result.estimatedCarbonSavedKgco2e.toFixed(1)}kg`,
+    rate: result.avgIngredientUseRate,
+    km: `${(result.estimatedCarbonSavedKgco2e * CARBON_KM_PER_KG).toFixed(1)}km`,
+    meals: `${(result.estimatedFoodWasteReducedGrams / GRAMS_PER_MEAL).toFixed(1)}끼`,
+    seedEval: { food: result.finishedFoodRate, use: {} },
+    parts,
+  };
 }
