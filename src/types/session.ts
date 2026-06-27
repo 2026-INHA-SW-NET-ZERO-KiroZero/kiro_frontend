@@ -99,8 +99,8 @@ export interface SelectedMenuSummaryResponse {
 
 export interface MenuVoteRequest {
   voteType: VoteType;
-  candidateLabel: string;
-  reasonText: string;
+  candidateLabel?: string;
+  reasonText?: string;
 }
 
 export interface MenuVoteResponse {

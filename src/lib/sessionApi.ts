@@ -94,8 +94,11 @@ export function getMySessionDetail(slotId: number): Promise<MySessionDetailRespo
 }
 
 /** 단계별 조리 가이드. `GET /api/v1/sessions/{slotId}/cooking-guide` */
-export function getCookingGuide(slotId: number): Promise<CookingGuideResponse> {
-  return apiRequest<CookingGuideResponse>(`/sessions/${slotId}/cooking-guide`);
+export function getCookingGuide(
+  slotId: number,
+  view: 'all' | 'mine' = 'all',
+): Promise<CookingGuideResponse> {
+  return apiRequest<CookingGuideResponse>(`/sessions/${slotId}/cooking-guide?view=${view}`);
 }
 
 /** 준비물 체크리스트·예약 크레딧·환불 힌트. `GET /api/v1/sessions/{slotId}/checklist` */

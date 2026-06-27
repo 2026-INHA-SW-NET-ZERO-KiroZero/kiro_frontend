@@ -11,7 +11,16 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
-import { useDecidedMenu, useMyApplication, usePartyPool, useVoteRecommendation } from '@/hooks';
+import {
+  useCookingGuide,
+  useDecidedMenu,
+  useMyApplication,
+  usePartyPool,
+  useSubmitVote,
+  useVoteConfirmed,
+  useVoteRecommendation,
+} from '@/hooks';
+import { buildMenuVoteRequest } from '@/lib/menuFlow';
 import { leaveSlot } from '@/lib/slotApi';
 import type { MenuRole, PartyProfile, VoteMenu } from '@/types';
 import {
@@ -52,18 +61,51 @@ export function MyApplicationScreen() {
     generating,
     generateError,
   } = useVoteRecommendation(slotId);
+  const {
+    submit: submitVoteApi,
+    loading: voteSubmitting,
+    error: voteError,
+  } = useSubmitVote(slotId);
+
+  const [myVote, setMyVote] = useState<number | null>(null);
+  const [votingDone, setVotingDone] = useState(false);
+  const [waitingVoteConfirmation, setWaitingVoteConfirmation] = useState(false);
+  const [voteReason, setVoteReason] = useState('');
+  const [canceling, setCanceling] = useState(false);
+
+  const guideEnabled = Boolean(application?.hasSelectedMenu || votingDone);
+  const { data: cookingGuide } = useCookingGuide(slotId, guideEnabled, 'all');
+  const { data: decided, refetch: refetchDecided } = useDecidedMenu(
+    slotId,
+    cookingGuide,
+    application?.myParticipantId,
+  );
+  const { confirmed: serverVoteConfirmed } = useVoteConfirmed(
+    slotId,
+    waitingVoteConfirmation && !application?.hasSelectedMenu && !votingDone,
+  );
 
   useEffect(() => {
     if (generateError) {
       Alert.alert('추천 생성 실패', generateError.message);
     }
   }, [generateError]);
-  const { data: decided } = useDecidedMenu(slotId);
 
-  const [myVote, setMyVote] = useState<number | null>(null);
-  const [votingDone, setVotingDone] = useState(false);
-  const [voteReason, setVoteReason] = useState('');
-  const [canceling, setCanceling] = useState(false);
+  useEffect(() => {
+    if (voteError) {
+      Alert.alert('투표 실패', voteError.message);
+    }
+  }, [voteError]);
+
+  useEffect(() => {
+    if (!serverVoteConfirmed) return;
+    const timer = setTimeout(() => {
+      setWaitingVoteConfirmation(false);
+      setVotingDone(true);
+      refetchDecided();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [refetchDecided, serverVoteConfirmed]);
 
   if (!application) {
     return <SafeAreaView style={styles.safe} edges={['top']} />;
@@ -71,11 +113,12 @@ export function MyApplicationScreen() {
 
   const { capacity, count } = application;
   const full = count >= capacity;
+  const hasConfirmedMenu = Boolean(application.hasSelectedMenu || decided !== null || votingDone);
   const stage: Stage = application.canceled
     ? 'canceled'
     : !full
       ? 'recruiting'
-      : votingDone
+      : hasConfirmedMenu
         ? 'result'
         : 'voting';
 
@@ -108,15 +151,34 @@ export function MyApplicationScreen() {
     ]);
   };
 
-  const submitVote = () => {
-    if (myVote == null) return;
-    if (myVote === E_OPTION) {
-      if (!voteReason.trim()) return;
-      setMyVote(null); // 재추천 요청 → 투표 리셋
-      setVoteReason('');
-      return;
+  const submitVote = async () => {
+    const request = buildMenuVoteRequest(myVote, voteMenus, voteReason);
+    if (request == null) return;
+
+    try {
+      const response = await submitVoteApi(request);
+      if (response.confirmed || response.selectedMenu != null) {
+        setWaitingVoteConfirmation(false);
+        setVotingDone(true);
+        refetchDecided();
+        return;
+      }
+
+      if (request.voteType === 'E') {
+        setMyVote(null);
+        setVoteReason('');
+        Alert.alert(
+          '재추천 요청 완료',
+          '모든 참여자의 의견이 모이면 새로운 추천을 받을 수 있어요.',
+        );
+        return;
+      }
+
+      setWaitingVoteConfirmation(true);
+      Alert.alert('투표 완료', '다른 참여자의 투표를 기다리고 있어요.');
+    } catch {
+      // useSubmitVote의 error effect에서 메시지를 보여준다.
     }
-    setVotingDone(true);
   };
 
   const countText = `${count}/${capacity}명`;
@@ -202,14 +264,27 @@ export function MyApplicationScreen() {
         <LinearGradient colors={[color.appBgFade, color.appBg]} style={styles.sticky}>
           <Pressable
             onPress={submitVote}
-            disabled={!voteReady}
+            disabled={!voteReady || voteSubmitting || waitingVoteConfirmation}
             style={[
               styles.voteBtn,
-              { backgroundColor: voteReady ? color.brand : applicationStage.voteBtnDisabled },
-              voteReady && shadow.brandBtn,
+              {
+                backgroundColor:
+                  voteReady && !voteSubmitting && !waitingVoteConfirmation
+                    ? color.brand
+                    : applicationStage.voteBtnDisabled,
+              },
+              voteReady && !voteSubmitting && !waitingVoteConfirmation && shadow.brandBtn,
             ]}
           >
-            <Text style={styles.voteBtnText}>{eSel ? '재추천 요청하기' : '투표 완료하기'}</Text>
+            <Text style={styles.voteBtnText}>
+              {voteSubmitting
+                ? '투표 제출 중...'
+                : waitingVoteConfirmation
+                  ? '투표 결과 대기 중...'
+                  : eSel
+                    ? '재추천 요청하기'
+                    : '투표 완료하기'}
+            </Text>
           </Pressable>
         </LinearGradient>
       )}
@@ -542,7 +617,14 @@ function VoteCard({
 /* ------------------------------ result ------------------------------ */
 
 function ResultStage({ decided }: { decided: ReturnType<typeof useDecidedMenu>['data'] }) {
-  if (decided === null) return null;
+  if (decided === null) {
+    return (
+      <View style={styles.generateWrap}>
+        <Text style={styles.generateTitle}>확정 메뉴를 불러오는 중이에요</Text>
+        <Text style={styles.generateSub}>투표 결과와 조리 가이드를 확인하고 있어요.</Text>
+      </View>
+    );
+  }
   return (
     <>
       <View style={styles.resultHeader}>

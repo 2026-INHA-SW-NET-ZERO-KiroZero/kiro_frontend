@@ -21,4 +21,8 @@ export interface MyApplication {
   canceled?: boolean;
   /** API 세션 상태 (OPEN | MENU_PROPOSED | COMPLETED). */
   status?: SessionStatus;
+  /** 현재 사용자의 세션 참여자 ID. */
+  myParticipantId?: number;
+  /** 투표로 메뉴가 확정된 상태. */
+  hasSelectedMenu?: boolean;
 }

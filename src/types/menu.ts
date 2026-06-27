@@ -65,12 +65,13 @@ export interface MenuRole {
 export interface DecidedMenu {
   name: string;
   emoji: string;
+  type: '저탄소' | '일반';
   time: string;
   servings: string;
   co2: string;
   /** 득표 표기 (예: '4표 중 2표'). */
   votes: string;
-  purchase: Purchase;
+  purchase: Purchase | null;
   recipe: string[];
   roles: MenuRole[];
 }

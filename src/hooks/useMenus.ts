@@ -4,8 +4,10 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { menuTypeLabel, plannedFoodWasteText, toDecidedMenu } from '@/lib/menuFlow';
 import { getLatestRecommendation, requestRecommendation, submitVoteApi } from '@/lib/sessionApi';
 import type { DecidedMenu, MenuCandidate, VoteMenu } from '@/types';
+import type { CookingGuideResponse } from '@/types/api/cookingGuide';
 import type {
   MenuCandidateResponse,
   MenuVoteRequest,
@@ -15,15 +17,11 @@ import type {
 
 import { useApiData, type AsyncResult } from './useApiData';
 
-function candidateToMenuType(menuType: string): '저탄소' | '일반' {
-  return menuType === '저탄소' ? '저탄소' : '일반';
-}
-
 function toMenuCandidate(c: MenuCandidateResponse): MenuCandidate {
   return {
     candidateLabel: c.candidateLabel,
     name: c.menuName,
-    type: candidateToMenuType(c.menuType),
+    type: menuTypeLabel(c.menuType),
     time: `${c.cookingTimeMinutes}분`,
     diff: c.difficulty,
     desc: c.recommendationReason,
@@ -43,9 +41,10 @@ function toVoteMenu(c: MenuCandidateResponse, votes: number): VoteMenu {
     key: c.candidateLabel,
     candidateLabel: c.candidateLabel,
     name: c.menuName,
-    type: candidateToMenuType(c.menuType),
+    type: menuTypeLabel(c.menuType),
     desc: c.recommendationReason,
     votes,
+    co2: plannedFoodWasteText(c),
     purchase:
       c.purchaseItems.length > 0
         ? {
@@ -77,23 +76,17 @@ export function useVoteMenus(slotId: number): AsyncResult<VoteMenu[]> {
 }
 
 /** 투표로 확정된 메뉴 (myApplication result 단계). selectedMenu 요약만 반환. */
-export function useDecidedMenu(slotId: number): AsyncResult<DecidedMenu | null> {
+export function useDecidedMenu(
+  slotId: number,
+  cookingGuide: CookingGuideResponse | null = null,
+  myParticipantId?: number | null,
+): AsyncResult<DecidedMenu | null> {
   const fetcher = useCallback(
     () =>
-      getLatestRecommendation(slotId).then((res): DecidedMenu | null => {
-        if (res.selectedMenu == null) return null;
-        return {
-          name: res.selectedMenu.menuName,
-          type: candidateToMenuType(res.selectedMenu.menuType),
-          time: '',
-          servings: '',
-          votes: '',
-          purchase: { item: '', buyer: '', cost: '' },
-          recipe: [],
-          roles: [],
-        } as unknown as DecidedMenu;
-      }),
-    [slotId],
+      getLatestRecommendation(slotId).then((res) =>
+        toDecidedMenu(res, cookingGuide, myParticipantId),
+      ),
+    [slotId, cookingGuide, myParticipantId],
   );
   return useApiData(fetcher, { initial: null, isEmpty: (d) => d === null });
 }

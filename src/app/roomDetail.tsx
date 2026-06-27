@@ -335,7 +335,7 @@ export default function RoomDetailScreen() {
               setShowJoinSheet(false);
               const willBeFull = baseCount + 1 >= (room.capacity ?? 4);
               if (willBeFull) {
-                router.push('/myApplication');
+                router.push(`/myApplication?id=${slotId}`);
               }
             })
             .catch(() => {});

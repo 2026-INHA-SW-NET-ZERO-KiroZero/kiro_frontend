@@ -125,6 +125,9 @@ export function mySessionItemToApplication(item: MySessionItemResponse): MyAppli
     capacity: item.capacity,
     count: Number(item.participantCount),
     dday: ddayLabel(item.date),
+    status: item.status,
+    myParticipantId: item.participantId,
+    hasSelectedMenu: item.hasSelectedMenu,
   };
 }
 
