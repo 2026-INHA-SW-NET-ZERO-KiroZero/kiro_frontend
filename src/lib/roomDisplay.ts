@@ -69,8 +69,11 @@ function resolveCta(input: RoomDisplayInput, seatsLeft: number): RoomCta {
       : { label: 'AI 메뉴 추천 받기', action: 'recommend', disabled: false, variant: 'primary' };
   }
   // OPEN
-  if (joined) {
+  if (joined && seatsLeft > 0) {
     return { label: '신청 취소', action: 'cancel', disabled: false, variant: 'grey' };
+  }
+  if (joined) {
+    return { label: '신청 완료', action: null, disabled: true, variant: 'grey' };
   }
   if (seatsLeft <= 0) {
     return { label: '마감', action: null, disabled: true, variant: 'grey' };

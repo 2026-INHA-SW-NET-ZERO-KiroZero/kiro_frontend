@@ -38,21 +38,25 @@ export default function RoomDetailScreen() {
 
   const slotId = Number(id);
 
-  const { data: room } = useRoomDetail(id ?? '');
-  const { data: partyPool } = usePartyPool(slotId);
-  const { data: aggList } = useAggIngredients(slotId);
+  const { data: room, refetch: refetchRoom } = useRoomDetail(id ?? '');
+  const { data: partyPool, refetch: refetchPartyPool } = usePartyPool(slotId);
+  const { data: aggList, refetch: refetchAggList } = useAggIngredients(slotId);
   // 로컬 override가 없으면 API 응답 joined 값을 사용
   const joined = joinedOverride ?? room?.joined ?? false;
 
   // API participantCount는 현재 사용자를 포함한 수를 반환한다.
-  // joinedOverride로 낙관적 업데이트 시에만 ±1 보정한다.
+  // joinedOverride는 API가 아직 최신 값을 반영하기 전일 때만 ±1 보정한다.
   const baseCount = room?.baseCount ?? 0;
-  const liveCount =
-    joinedOverride === true
+  const apiJoined = room?.joined ?? false;
+  const capacity = room?.capacity ?? 4;
+  const liveCount = Math.min(
+    capacity,
+    joinedOverride === true && !apiJoined
       ? baseCount + 1
-      : joinedOverride === false
+      : joinedOverride === false && apiJoined
         ? Math.max(0, baseCount - 1)
-        : baseCount;
+        : baseCount,
+  );
 
   const display = roomDisplay({
     state: heroStatus,
@@ -65,6 +69,18 @@ export default function RoomDetailScreen() {
   if (!room) {
     return <SafeAreaView style={styles.screen} edges={['top']} />;
   }
+
+  const visibleParticipantCount = Math.min(liveCount, room.capacity);
+  const participantProfiles = Array.from(
+    { length: visibleParticipantCount },
+    (_, idx) =>
+      partyPool?.[idx] ?? {
+        skill: '하',
+        allergies: [],
+        bring: [],
+        extra: false,
+      },
+  );
 
   const infoItems: { icon: IconName; label: string }[] = [
     { icon: 'wc', label: '요리실력 무관' },
@@ -168,7 +184,7 @@ export default function RoomDetailScreen() {
         {/* 6. 참여자 카드 섹션 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>참여자</Text>
-          {(partyPool ?? []).slice(0, room.baseCount).map((profile, idx) => {
+          {participantProfiles.map((profile, idx) => {
             const isHost = idx === 0;
             const isMe = idx === 1;
             const avatarColor = room.parts[idx % room.parts.length]?.c ?? color.brand;
@@ -177,7 +193,7 @@ export default function RoomDetailScreen() {
                 key={idx}
                 style={[
                   styles.participantCard,
-                  idx < room.baseCount - 1 && styles.participantDivider,
+                  idx < visibleParticipantCount - 1 && styles.participantDivider,
                 ]}
               >
                 <View style={styles.participantHeader}>
@@ -333,6 +349,9 @@ export default function RoomDetailScreen() {
             .then(() => {
               setJoinedOverride(true);
               setShowJoinSheet(false);
+              refetchRoom();
+              refetchPartyPool();
+              refetchAggList();
               const willBeFull = baseCount + 1 >= (room.capacity ?? 4);
               if (willBeFull) {
                 router.push(`/myApplication?id=${slotId}`);

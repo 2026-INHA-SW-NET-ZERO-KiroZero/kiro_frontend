@@ -223,6 +223,7 @@ export function useRecommendation(slotId: number): UseRecommendationResult {
 
 interface UseVoteRecommendationResult {
   status: SessionStatus;
+  recommendationCount: number;
   voteMenus: VoteMenu[];
   loading: boolean;
   error: Error | null;
@@ -241,13 +242,14 @@ export function useVoteRecommendation(slotId: number): UseVoteRecommendationResu
     () =>
       getLatestRecommendation(slotId).then((res) => ({
         status: res.status,
+        recommendationCount: res.recommendationCount,
         voteMenus: res.candidates.map((c) => toVoteMenu(c, 0)),
       })),
     [slotId],
   );
 
   const { data, loading, error, refetch } = useApiData(fetcher, {
-    initial: { status: 'OPEN' as SessionStatus, voteMenus: [] },
+    initial: { status: 'OPEN' as SessionStatus, recommendationCount: 0, voteMenus: [] },
     isEmpty: (d) => d.voteMenus.length === 0,
   });
 
@@ -267,6 +269,7 @@ export function useVoteRecommendation(slotId: number): UseVoteRecommendationResu
 
   return {
     status: data.status,
+    recommendationCount: data.recommendationCount,
     voteMenus: data.voteMenus,
     loading,
     error,

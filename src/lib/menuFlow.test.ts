@@ -1,4 +1,9 @@
-import { buildMenuVoteRequest, menuTypeLabel, toDecidedMenu } from './menuFlow';
+import {
+  buildMenuVoteRequest,
+  menuTypeLabel,
+  toDecidedMenu,
+  voteIndexFromSubmittedVote,
+} from './menuFlow';
 
 import type { CookingGuideResponse } from '@/types/api/cookingGuide';
 import type { LatestRecommendationResponse } from '@/types/session';
@@ -113,6 +118,33 @@ describe('menuFlow', () => {
       voteType: 'E',
       reasonText: '너무 비슷한 메뉴가 많아요',
     });
+  });
+
+  it('이미 제출한 투표를 현재 후보 index로 복원한다', () => {
+    const menus = [
+      {
+        key: 'A',
+        candidateLabel: 'A',
+        name: 'A',
+        type: '일반' as const,
+        desc: '',
+        votes: 0,
+        purchase: null,
+      },
+      {
+        key: 'C',
+        candidateLabel: 'C',
+        name: 'C',
+        type: '저탄소' as const,
+        desc: '',
+        votes: 0,
+        purchase: null,
+      },
+    ];
+
+    expect(voteIndexFromSubmittedVote(menus, 'C', 'C')).toBe(1);
+    expect(voteIndexFromSubmittedVote(menus, 'E')).toBe(4);
+    expect(voteIndexFromSubmittedVote(menus, 'D', 'D')).toBeNull();
   });
 
   it('확정 메뉴와 조리 가이드로 결과 화면 데이터를 만든다', () => {

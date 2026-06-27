@@ -51,6 +51,17 @@ export function buildMenuVoteRequest(
   };
 }
 
+export function voteIndexFromSubmittedVote(
+  voteMenus: VoteMenu[],
+  voteType: VoteType,
+  candidateLabel?: string,
+): number | null {
+  if (voteType === 'E') return REGENERATION_VOTE_INDEX;
+
+  const index = voteMenus.findIndex((menu) => menu.candidateLabel === candidateLabel);
+  return index < 0 ? null : index;
+}
+
 export function toDecidedMenu(
   latest: LatestRecommendationResponse,
   cookingGuide: CookingGuideResponse | null = null,

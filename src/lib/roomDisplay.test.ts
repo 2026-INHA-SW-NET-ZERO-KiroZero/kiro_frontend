@@ -36,12 +36,22 @@ describe('roomDisplay — OPEN', () => {
     expect(d.badge).toBe('full');
   });
 
-  it('참여 중이면 신청 취소 (정원 무관)', () => {
+  it('참여 중이어도 정원 마감 전까지만 신청 취소', () => {
     const d = roomDisplay({ state: 'OPEN', capacity: 4, count: 2, joined: true });
     expect(d.cta).toEqual({
       label: '신청 취소',
       action: 'cancel',
       disabled: false,
+      variant: 'grey',
+    });
+  });
+
+  it('참여 중이고 정원이 차면 신청 완료로 잠근다', () => {
+    const d = roomDisplay({ state: 'OPEN', capacity: 4, count: 4, joined: true });
+    expect(d.cta).toEqual({
+      label: '신청 완료',
+      action: null,
+      disabled: true,
       variant: 'grey',
     });
   });

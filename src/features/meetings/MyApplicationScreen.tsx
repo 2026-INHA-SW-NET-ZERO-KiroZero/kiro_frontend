@@ -20,8 +20,9 @@ import {
   useVoteConfirmed,
   useVoteRecommendation,
 } from '@/hooks';
-import { buildMenuVoteRequest } from '@/lib/menuFlow';
+import { buildMenuVoteRequest, voteIndexFromSubmittedVote } from '@/lib/menuFlow';
 import { leaveSlot } from '@/lib/slotApi';
+import { voteProgressStorage } from '@/lib/voteProgressStorage';
 import type { MenuRole, PartyProfile, VoteMenu } from '@/types';
 import {
   applicationStage,
@@ -56,6 +57,7 @@ export function MyApplicationScreen() {
   const { data: partyPool } = usePartyPool(slotId);
   const {
     status: recStatus,
+    recommendationCount,
     voteMenus,
     generate: generateRec,
     generating,
@@ -96,6 +98,39 @@ export function MyApplicationScreen() {
       Alert.alert('투표 실패', voteError.message);
     }
   }, [voteError]);
+
+  useEffect(() => {
+    let active = true;
+
+    voteProgressStorage.get(slotId).then((progress) => {
+      if (!active || progress == null) return;
+
+      const stale =
+        progress.recommendationCount !== recommendationCount ||
+        recStatus !== 'MENU_PROPOSED' ||
+        application?.hasSelectedMenu ||
+        votingDone;
+
+      if (stale) {
+        voteProgressStorage.clear(slotId);
+        return;
+      }
+
+      const voteIndex = voteIndexFromSubmittedVote(
+        voteMenus,
+        progress.voteType,
+        progress.candidateLabel,
+      );
+
+      if (voteIndex == null) return;
+      setMyVote(voteIndex);
+      setWaitingVoteConfirmation(true);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [application?.hasSelectedMenu, recommendationCount, recStatus, slotId, voteMenus, votingDone]);
 
   useEffect(() => {
     if (!serverVoteConfirmed) return;
@@ -158,14 +193,22 @@ export function MyApplicationScreen() {
     try {
       const response = await submitVoteApi(request);
       if (response.confirmed || response.selectedMenu != null) {
+        await voteProgressStorage.clear(slotId);
         setWaitingVoteConfirmation(false);
         setVotingDone(true);
         refetchDecided();
         return;
       }
 
+      await voteProgressStorage.set({
+        slotId,
+        recommendationCount: response.recommendationCount,
+        voteType: request.voteType,
+        candidateLabel: request.candidateLabel,
+      });
+      setWaitingVoteConfirmation(true);
+
       if (request.voteType === 'E') {
-        setMyVote(null);
         setVoteReason('');
         Alert.alert(
           '재추천 요청 완료',
@@ -174,7 +217,6 @@ export function MyApplicationScreen() {
         return;
       }
 
-      setWaitingVoteConfirmation(true);
       Alert.alert('투표 완료', '다른 참여자의 투표를 기다리고 있어요.');
     } catch {
       // useSubmitVote의 error effect에서 메시지를 보여준다.
