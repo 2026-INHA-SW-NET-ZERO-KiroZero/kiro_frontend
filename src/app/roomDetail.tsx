@@ -44,9 +44,15 @@ export default function RoomDetailScreen() {
   // 로컬 override가 없으면 API 응답 joined 값을 사용
   const joined = joinedOverride ?? room?.joined ?? false;
 
-  // 신청 시 본인 인원이 추가되어 정원이 채워진다(3/4 → 4/4 매치 확정).
-  const baseCount = room?.baseCount ?? 3;
-  const liveCount = baseCount + (joined ? 1 : 0);
+  // API participantCount는 현재 사용자를 포함한 수를 반환한다.
+  // joinedOverride로 낙관적 업데이트 시에만 ±1 보정한다.
+  const baseCount = room?.baseCount ?? 0;
+  const liveCount =
+    joinedOverride === true
+      ? baseCount + 1
+      : joinedOverride === false
+        ? Math.max(0, baseCount - 1)
+        : baseCount;
 
   const display = roomDisplay({
     state: heroStatus,
