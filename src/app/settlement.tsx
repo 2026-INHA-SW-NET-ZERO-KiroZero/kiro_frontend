@@ -1,7 +1,7 @@
 /**
- * 정산 화면 (PRD §3.7).
- * 빨강 그라데이션 hero(1인당 분담액) → 영수증 → 정산 현황(결제자·분담자) → 균등분배 안내.
- * 데이터는 useSettlement(id) 훅 경유. 금액은 toLocaleString('ko-KR')+'원' 포맷.
+ * 정산 체크리스트 화면 (PRD §3.7).
+ * 구매 항목(담당자·예상 비용) → 공용 키트 → 내 재료 → 예약 크레딧·환불 힌트.
+ * 데이터는 useSettlement(slotId) 훅 경유 (`GET /api/v1/sessions/{slotId}/checklist`).
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,7 +19,10 @@ function formatKRW(amount: number): string {
 export default function SettlementScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const { data } = useSettlement(id ?? '');
+  const slotId = Number(id ?? '0');
+  const { data, loading } = useSettlement(slotId);
+
+  const totalCost = (data?.purchaseItems ?? []).reduce((sum, item) => sum + item.estimatedCost, 0);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -27,7 +30,7 @@ export default function SettlementScreen() {
         <Pressable onPress={() => router.back()} hitSlop={8} style={styles.backBtn}>
           <Icon name="arrow-back-ios" size={20} color={color.ink} />
         </Pressable>
-        <Text style={styles.headerTitle}>정산</Text>
+        <Text style={styles.headerTitle}>정산 체크리스트</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -36,58 +39,99 @@ export default function SettlementScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <LinearGradient
-          colors={gradient.brand}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.heroCard, shadow.hero]}
-        >
-          <Text style={styles.heroLabel}>1인당 분담액</Text>
-          <Text style={styles.heroPer}>{formatKRW(data.per)}</Text>
-          <View style={styles.heroMeta}>
-            <Text style={styles.heroMetaText}>총 {formatKRW(data.total)}</Text>
-            <Text style={styles.heroMetaDot}>·</Text>
-            <Text style={styles.heroMetaText}>결제자 {data.payer}</Text>
+        {loading ? (
+          <View style={styles.loadingBox}>
+            <Text style={styles.loadingText}>불러오는 중…</Text>
           </View>
-        </LinearGradient>
+        ) : (
+          <>
+            {/* Hero — 총 구매 비용 */}
+            <LinearGradient
+              colors={gradient.brand}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.heroCard, shadow.hero]}
+            >
+              <Text style={styles.heroLabel}>{data?.menuName ?? '—'}</Text>
+              <Text style={styles.heroPer}>{formatKRW(totalCost)}</Text>
+              <Text style={styles.heroSub}>총 구매 예상 비용</Text>
+              {(data?.reservationCredit ?? 0) > 0 && (
+                <View style={styles.creditChip}>
+                  <Icon name="savings" size={14} color={color.white} />
+                  <Text style={styles.creditText}>
+                    예약 크레딧 {formatKRW(data?.reservationCredit ?? 0)}
+                  </Text>
+                </View>
+              )}
+            </LinearGradient>
 
-        <SectionSlab marginTop={space.x8} marginBottom={0} />
+            {/* 구매 항목 */}
+            {(data?.purchaseItems ?? []).length > 0 && (
+              <>
+                <SectionSlab marginTop={space.x8} marginBottom={0} />
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>구매 항목</Text>
+                  {(data?.purchaseItems ?? []).map((item, i) => (
+                    <View key={i} style={styles.receiptRow}>
+                      <View style={styles.receiptLeft}>
+                        <Text style={styles.receiptName}>{item.name}</Text>
+                        <Text style={styles.receiptAssignee}>{item.assignedToNickname} 담당</Text>
+                      </View>
+                      <Text style={styles.receiptAmt}>{formatKRW(item.estimatedCost)}</Text>
+                    </View>
+                  ))}
+                  <View style={styles.totalRow}>
+                    <Text style={styles.totalLabel}>합계</Text>
+                    <Text style={styles.totalAmt}>{formatKRW(totalCost)}</Text>
+                  </View>
+                </View>
+              </>
+            )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>영수증</Text>
-          {data.items.map((item) => (
-            <View key={item.n} style={styles.receiptRow}>
-              <Text style={styles.receiptName}>{item.n}</Text>
-              <Text style={styles.receiptAmt}>{formatKRW(item.a)}</Text>
-            </View>
-          ))}
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>합계</Text>
-            <Text style={styles.totalAmt}>{formatKRW(data.total)}</Text>
-          </View>
-        </View>
+            {/* 공용 키트 */}
+            {(data?.commonKitItems ?? []).length > 0 && (
+              <>
+                <SectionSlab marginTop={space.x8} marginBottom={0} />
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>공용 키트</Text>
+                  <View style={styles.kitGrid}>
+                    {(data?.commonKitItems ?? []).map((item, i) => (
+                      <View key={i} style={styles.kitChip}>
+                        <Text style={styles.kitChipText}>{item}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              </>
+            )}
 
-        <SectionSlab marginTop={space.x8} marginBottom={0} />
+            {/* 내 재료 */}
+            {(data?.myIngredients ?? []).length > 0 && (
+              <>
+                <SectionSlab marginTop={space.x8} marginBottom={0} />
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>내가 가져올 재료</Text>
+                  {(data?.myIngredients ?? []).map((item) => (
+                    <View key={item.sessionIngredientId} style={styles.ingRow}>
+                      <Text style={styles.ingName}>{item.nameKo}</Text>
+                      <Text style={styles.ingQty}>
+                        {item.knownGrams != null ? `${item.knownGrams}g` : `${item.count}개`}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>정산 현황</Text>
-          <View style={styles.statusRow}>
-            <Icon name="person" size={16} color={color.textFaint} />
-            <Text style={styles.statusName}>{data.payer}</Text>
-            <View style={styles.paidChip}>
-              <Text style={styles.paidChipText}>결제 완료</Text>
-            </View>
-          </View>
-          {data.debtors.map((d) => (
-            <View key={d.n} style={styles.statusRow}>
-              <Icon name="person" size={16} color={color.textFaint} />
-              <Text style={styles.statusName}>{d.n}</Text>
-              <Text style={styles.debtorAmt}>{formatKRW(d.a)} 보냄</Text>
-            </View>
-          ))}
-        </View>
-
-        <Text style={styles.equalNote}>균등분배 기준 자동 계산</Text>
+            {/* 환불 힌트 */}
+            {!!data?.refundHint && (
+              <View style={styles.refundNote}>
+                <Icon name="info" size={15} color={color.brandStrong} />
+                <Text style={styles.refundNoteText}>{data.refundHint}</Text>
+              </View>
+            )}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -127,6 +171,16 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 40,
   },
+  loadingBox: {
+    flex: 1,
+    alignItems: 'center',
+    paddingTop: space.x10,
+  },
+  loadingText: {
+    fontSize: font.size.sm,
+    fontFamily: font.family.medium,
+    color: color.textFaint,
+  },
   // ---- hero ----
   heroCard: {
     marginHorizontal: space.screenX,
@@ -150,23 +204,28 @@ const styles = StyleSheet.create({
     color: color.white,
     letterSpacing: font.tracking.tightH,
   },
-  heroMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-    marginTop: space.xs,
-  },
-  heroMetaText: {
+  heroSub: {
     fontSize: font.size.cap,
     fontFamily: font.family.medium,
     color: color.white,
+    opacity: 0.85,
     letterSpacing: font.tracking.snug,
-    opacity: 0.9,
   },
-  heroMetaDot: {
+  creditChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.xs,
+    marginTop: space.xs,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: radius.pill,
+    paddingVertical: space.xs,
+    paddingHorizontal: space.md,
+  },
+  creditText: {
     fontSize: font.size.cap,
+    fontFamily: font.family.bold,
     color: color.white,
-    opacity: 0.6,
+    letterSpacing: font.tracking.snug,
   },
   // ---- 섹션 공용 ----
   section: {
@@ -181,7 +240,7 @@ const styles = StyleSheet.create({
     letterSpacing: font.tracking.tight,
     marginBottom: space.x2,
   },
-  // ---- 영수증 ----
+  // ---- 구매 항목 ----
   receiptRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -190,10 +249,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: color.hair,
   },
+  receiptLeft: {
+    flex: 1,
+    gap: space.xs,
+  },
   receiptName: {
     fontSize: font.size.sm,
     fontFamily: font.family.medium,
     color: color.ink3,
+    letterSpacing: font.tracking.snug,
+  },
+  receiptAssignee: {
+    fontSize: font.size.cap,
+    fontFamily: font.family.medium,
+    color: color.textFaint,
     letterSpacing: font.tracking.snug,
   },
   receiptAmt: {
@@ -220,47 +289,66 @@ const styles = StyleSheet.create({
     color: color.brandStrong,
     letterSpacing: font.tracking.tight,
   },
-  // ---- 정산 현황 ----
-  statusRow: {
+  // ---- 공용 키트 ----
+  kitGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space.sm,
+  },
+  kitChip: {
+    backgroundColor: color.appBgInput,
+    borderWidth: 1,
+    borderColor: color.borderInput,
+    borderRadius: radius.chip,
+    paddingHorizontal: space.md,
+    paddingVertical: space.xs,
+  },
+  kitChipText: {
+    fontSize: font.size.cap,
+    fontFamily: font.family.medium,
+    color: color.ink3,
+    letterSpacing: font.tracking.snug,
+  },
+  // ---- 내 재료 ----
+  ingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.md,
+    justifyContent: 'space-between',
     paddingVertical: space.lg,
     borderBottomWidth: 1,
     borderBottomColor: color.hair,
   },
-  statusName: {
+  ingName: {
     flex: 1,
     fontSize: font.size.sm,
     fontFamily: font.family.semibold,
     color: color.ink,
     letterSpacing: font.tracking.snug,
   },
-  paidChip: {
-    paddingVertical: space.xs,
-    paddingHorizontal: space.md,
-    borderRadius: radius.pill,
-    backgroundColor: color.ecoBgSoft,
-  },
-  paidChipText: {
-    fontSize: font.size.micro,
+  ingQty: {
+    fontSize: font.size.sm,
     fontFamily: font.family.bold,
-    color: color.ecoText,
-    letterSpacing: font.tracking.base,
-  },
-  debtorAmt: {
-    fontSize: font.size.cap,
-    fontFamily: font.family.medium,
-    color: color.textMute,
+    color: color.ink3,
     letterSpacing: font.tracking.snug,
   },
-  equalNote: {
+  // ---- 환불 힌트 ----
+  refundNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: space.sm,
+    marginHorizontal: space.screenX,
+    marginTop: space.x6,
+    marginBottom: space.x10,
+    backgroundColor: color.redBgSoft,
+    borderRadius: radius.lg,
+    padding: space.x2,
+  },
+  refundNoteText: {
+    flex: 1,
     fontSize: font.size.cap,
     fontFamily: font.family.medium,
-    color: color.textFaint,
+    color: color.brandStrong,
     letterSpacing: font.tracking.snug,
-    textAlign: 'center',
-    paddingTop: space.x6,
-    paddingBottom: space.x10,
+    lineHeight: font.size.cap * 1.6,
   },
 });

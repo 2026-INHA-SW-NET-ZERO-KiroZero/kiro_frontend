@@ -92,7 +92,7 @@ export default function RoomDetailScreen() {
         router.push(`/usage?slotId=${slotId}`);
         break;
       case 'settlement':
-        router.push('/settlement');
+        router.push(`/settlement?id=${slotId}`);
         break;
       default:
         break;

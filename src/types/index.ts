@@ -34,7 +34,6 @@ export type {
 } from './menu';
 export type { NotifType, NotifTone, Notif } from './notification';
 export type { MyApplication } from './application';
-export type { SettleItem, Debtor, Settlement } from './settlement';
 export type { PastMenu, SeedEval, PastPart, PastMeeting } from './meeting';
 export type { MonthlyResultSummaryResponse, MyResultTotalResponse } from './result';
 export type { DataResult } from './query';
@@ -68,3 +67,10 @@ export type {
   CreateConsumptionRecordRequest,
   CreateConsumptionRecordResponse,
 } from './api/consumptionRecord';
+export type {
+  CookingUsedIngredientResponse,
+  ParticipantTaskResponse,
+  CookingGuideStepResponse,
+  CookingGuideResponse,
+  SessionChecklistResponse,
+} from './api/cookingGuide';

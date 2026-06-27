@@ -26,6 +26,8 @@ export { usePartyPool } from './usePartyPool';
 export { useReport } from './useReport';
 export type { ReportBar, ReportView, UseReportResult } from './useReport';
 export { useResultTotal } from './useResultTotal';
+export { useCookingGuide } from './useCookingGuide';
+export { useSessionResult } from './useSessionResult';
 export { useAuth, AuthContext } from './useAuth';
 export { useProfile, ProfileContext, useProfileProvider } from './useProfile';
 export { usePastEval, PastEvalContext, usePastEvalProvider } from './usePastEval';

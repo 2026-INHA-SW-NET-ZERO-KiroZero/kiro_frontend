@@ -1,5 +1,6 @@
 /**
- * 세션·추천·투표 API (api-schema.md session/recommendation/menu-vote-controller §).
+ * 세션·추천·투표·조리 가이드·체크리스트·리포트 API
+ * (api-schema.md session/recommendation/menu-vote/consumption-result-controller §).
  * 훅 내부에서만 호출한다 — UI는 훅으로 접근.
  */
 import { apiRequest } from '@/lib/apiClient';
@@ -14,6 +15,8 @@ import type {
   UpdateSessionIngredientsRequest,
   UpdateSessionIngredientsResponse,
 } from '@/types/session';
+import type { CookingGuideResponse, SessionChecklistResponse } from '@/types/api/cookingGuide';
+import type { SessionResultResponse } from '@/types/api/mySession';
 
 /** 세션 현황(참여자·공유 재료 풀). `GET /api/v1/sessions/{slotId}` */
 export function getSession(slotId: number): Promise<SessionStatusResponse> {
@@ -56,4 +59,19 @@ export function listMySessions(): Promise<MySessionListResponse> {
 /** 내 모임 세션 상세. `GET /api/v1/me/sessions/{slotId}` */
 export function getMySessionDetail(slotId: number): Promise<MySessionDetailResponse> {
   return apiRequest<MySessionDetailResponse>(`/me/sessions/${slotId}`);
+}
+
+/** 단계별 조리 가이드. `GET /api/v1/sessions/{slotId}/cooking-guide` */
+export function getCookingGuide(slotId: number): Promise<CookingGuideResponse> {
+  return apiRequest<CookingGuideResponse>(`/sessions/${slotId}/cooking-guide`);
+}
+
+/** 준비물 체크리스트·예약 크레딧·환불 힌트. `GET /api/v1/sessions/{slotId}/checklist` */
+export function getSessionChecklist(slotId: number): Promise<SessionChecklistResponse> {
+  return apiRequest<SessionChecklistResponse>(`/sessions/${slotId}/checklist`);
+}
+
+/** 세션 탄소 절감 리포트. `GET /api/v1/sessions/{slotId}/result` */
+export function getSessionResult(slotId: number): Promise<SessionResultResponse> {
+  return apiRequest<SessionResultResponse>(`/sessions/${slotId}/result`);
 }
